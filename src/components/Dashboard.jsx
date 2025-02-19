@@ -46,6 +46,7 @@ const MotionCard = motion(Card);
 const MotionBox = motion(Box);
 
 function Dashboard() {
+  const [students, setStudents] = useState([]);
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalCourses: 0,
@@ -54,7 +55,13 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [unsubmittedStudents, setUnsubmittedStudents] = useState([]);
+  const [selectedFacultyStudents, setSelectedFacultyStudents] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isFacultyModalOpen,
+    onOpen: onFacultyModalOpen,
+    onClose: onFacultyModalClose
+  } = useDisclosure();
   const toast = useToast();
 
   const [filters, setFilters] = useState({
@@ -74,64 +81,89 @@ function Dashboard() {
   });
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchStudents = async () => {
+      setLoading(true);
       try {
         const response = await axios.get('https://nptel-management-backend.onrender.com/api/students');
-        const students = response.data;
+        const fetchedStudents = response.data;
+        setStudents(fetchedStudents);
         
-        // Extract filter options including weeks
+        // Extract filter options
         const options = {
-          facultyNames: [...new Set(students.flatMap(s => s.courses.map(c => c.subjectMentor)))],
-          years: [...new Set(students.map(s => s.year))],
-          branches: [...new Set(students.map(s => s.branch))],
-          courseIds: [...new Set(students.flatMap(s => s.courses.map(c => c.courseId)))],
-          weeks: [...new Set(students.flatMap(s => 
+          facultyNames: [...new Set(fetchedStudents.flatMap(s => s.courses.map(c => c.subjectMentor)))],
+          years: [...new Set(fetchedStudents.map(s => s.year))],
+          branches: [...new Set(fetchedStudents.map(s => s.branch))],
+          courseIds: [...new Set(fetchedStudents.flatMap(s => s.courses.map(c => c.courseId)))],
+          weeks: [...new Set(fetchedStudents.flatMap(s => 
             s.courses.flatMap(c => c.results?.map(r => r.week) || [])
           ))]
         };
         setFilterOptions(options);
-
-        // Calculate statistics based on filters
-        const filteredStudents = students.filter(student => {
-          const matchesFaculty = !filters.facultyName || 
-            student.courses.some(c => c.subjectMentor === filters.facultyName);
-          const matchesYear = !filters.year || student.year === filters.year;
-          const matchesBranch = !filters.branch || student.branch === filters.branch;
-          const matchesCourse = !filters.courseId || 
-            student.courses.some(c => c.courseId === filters.courseId);
-          
-          return matchesFaculty && matchesYear && matchesBranch && matchesCourse;
-        });
-
-        // Calculate weekly stats with week filter
-        let weeklyStats = calculateWeeklyStats(filteredStudents, filters.courseId);
-        if (filters.week) {
-          weeklyStats = weeklyStats.filter(stat => stat.week === filters.week);
-        }
-
-        setStats({
-          totalStudents: filteredStudents.length,
-          totalCourses: new Set(filteredStudents.flatMap(s => 
-            s.courses.map(c => c.courseId)
-          )).size,
-          weeklyStats,
-        });
-
+        
+        updateStats(fetchedStudents);
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Error fetching students:', error);
+        toast({
+          title: "Error fetching data",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStats();
-  }, [filters]);
+    fetchStudents();
+  }, []);
 
-  const calculateWeeklyStats = (students, courseId) => {
+  useEffect(() => {
+    updateStats(students);
+  }, [filters, students]);
+
+  const updateStats = (studentsData) => {
+    // Filter students based on current filters
+    const filteredStudents = studentsData.filter(student => {
+      // If faculty is selected, only show students with that faculty's course
+      const matchesFaculty = !filters.facultyName || 
+        student.courses.some(c => c.subjectMentor === filters.facultyName);
+      const matchesYear = !filters.year || student.year === filters.year;
+      const matchesBranch = !filters.branch || student.branch === filters.branch;
+      const matchesCourse = !filters.courseId || 
+        student.courses.some(c => c.courseId === filters.courseId);
+      
+      return matchesFaculty && matchesYear && matchesBranch && matchesCourse;
+    });
+
+    // Calculate weekly stats only for the selected faculty's course
+    let weeklyStats = calculateWeeklyStats(
+      filteredStudents, 
+      filters.courseId,
+      filters.facultyName // Pass faculty name to calculateWeeklyStats
+    );
+    
+    if (filters.week) {
+      weeklyStats = weeklyStats.filter(stat => stat.week === filters.week);
+    }
+
+    setStats({
+      totalStudents: filteredStudents.length,
+      totalCourses: new Set(filteredStudents.flatMap(s => 
+        s.courses.map(c => c.courseId)
+      )).size,
+      weeklyStats,
+    });
+  };
+
+  const calculateWeeklyStats = (students, courseId, facultyName) => {
     const weeklyData = {};
     
     students.forEach(student => {
-      const course = student.courses.find(c => !courseId || c.courseId === courseId);
+      const course = student.courses.find(c => 
+        (!courseId || c.courseId === courseId) &&
+        (!facultyName || c.subjectMentor === facultyName)
+      );
+
       if (course && course.results) {
         course.results.forEach(result => {
           if (!weeklyData[result.week]) {
@@ -227,6 +259,28 @@ function Dashboard() {
     }
   };
 
+  const handleFacultyClick = (facultyName) => {
+    if (!filters.courseId) {
+      toast({
+        title: "Please select a course",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const facultyStudents = students.filter(student => 
+      student.courses.some(course => 
+        course.subjectMentor === facultyName && 
+        course.courseId === filters.courseId
+      )
+    );
+
+    setSelectedFacultyStudents(facultyStudents);
+    onFacultyModalOpen();
+  };
+
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const notSubmittedCount = payload[1]?.value || 0;
@@ -275,7 +329,12 @@ function Dashboard() {
                 <Select
                   placeholder="Select Faculty"
                   value={filters.facultyName}
-                  onChange={(e) => setFilters({...filters, facultyName: e.target.value})}
+                  onChange={(e) => {
+                    setFilters({...filters, facultyName: e.target.value});
+                    if (e.target.value) {
+                      handleFacultyClick(e.target.value);
+                    }
+                  }}
                   maxW="200px"
                 >
                   {filterOptions.facultyNames.map(name => (
@@ -504,6 +563,61 @@ function Dashboard() {
                   <Text color="gray.500">No unsubmitted students found</Text>
                 </Box>
               )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        {/* Faculty Students Modal */}
+        <Modal 
+          isOpen={isFacultyModalOpen} 
+          onClose={onFacultyModalClose}
+          size="xl"
+          scrollBehavior="inside"
+        >
+          <ModalOverlay />
+          <ModalContent maxW="900px">
+            <ModalHeader>
+              <Text>Students for {filters.facultyName} - {filters.courseId}</Text>
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>Roll Number</Th>
+                    <Th>Name</Th>
+                    <Th>Branch</Th>
+                    <Th>Results</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {selectedFacultyStudents.map((student) => {
+                    const course = student.courses.find(c => 
+                      c.courseId === filters.courseId
+                    );
+                    return (
+                      <Tr key={student._id}>
+                        <Td>{student.rollNumber}</Td>
+                        <Td>{student.name}</Td>
+                        <Td>{student.branch}</Td>
+                        <Td>
+                          {course?.results?.length > 0 ? (
+                            <VStack align="start">
+                              {course.results.map((result, idx) => (
+                                <Text key={idx}>
+                                  Week {result.week}: {result.score}
+                                </Text>
+                              ))}
+                            </VStack>
+                          ) : (
+                            <Text color="gray.500">No results available</Text>
+                          )}
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              </Table>
             </ModalBody>
           </ModalContent>
         </Modal>
