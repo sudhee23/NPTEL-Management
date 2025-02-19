@@ -72,7 +72,7 @@ function StudentList() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/students');
+        const response = await axios.get('https://nptel-management-backend.onrender.com/api/students');
         setStudents(response.data);
         setLoading(false);
       } catch (error) {

@@ -32,7 +32,7 @@ function UploadExcel() {
     setUploadResult(null);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/students/bulk', formData, {
+      const response = await axios.post('https://nptel-management-backend.onrender.com/api/students/bulk', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

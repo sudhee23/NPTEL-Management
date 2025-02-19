@@ -76,7 +76,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/students');
+        const response = await axios.get('https://nptel-management-backend.onrender.com/api/students');
         const students = response.data;
         
         // Extract filter options including weeks
@@ -366,39 +366,7 @@ function Dashboard() {
           </CardBody>
         </MotionCard>
 
-        {/* Stats Overview */}
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-          {[
-            { label: 'Total Students', value: stats.totalStudents, helpText: 'Currently enrolled' },
-            { label: 'Total Courses', value: stats.totalCourses, helpText: 'Active courses' },
-            { 
-              label: 'Average Submission Rate', 
-              value: `${Math.round(stats.weeklyStats.reduce((acc, curr) => acc + curr.submissionRate, 0) / (stats.weeklyStats.length || 1))}%`,
-              helpText: 'Across all weeks'
-            }
-          ].map((stat, index) => (
-            <MotionCard
-              key={stat.label}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-              whileHover={{ y: -5 }}
-            >
-              <CardBody>
-                <Stat>
-                  <StatLabel fontSize="md" color="gray.600">{stat.label}</StatLabel>
-                  <Skeleton isLoaded={!loading}>
-                    <StatNumber fontSize="3xl">{stat.value}</StatNumber>
-                  </Skeleton>
-                  <StatHelpText>
-                    <StatArrow type="increase" />
-                    {stat.helpText}
-                  </StatHelpText>
-                </Stat>
-              </CardBody>
-            </MotionCard>
-          ))}
-        </SimpleGrid>
+      
 
         {/* Weekly Submission Stats */}
         <MotionCard>
