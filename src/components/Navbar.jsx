@@ -5,6 +5,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 function Navbar() {
   const navigate = useNavigate();
   const toast = useToast();
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
@@ -29,9 +30,11 @@ function Navbar() {
           <Link as={RouterLink} to="/students" color="gray.600" fontWeight="medium">
             Students
           </Link>
-          <Link as={RouterLink} to="/upload" color="gray.600" fontWeight="medium">
-            Upload Excel
-          </Link>
+          {isAdmin && (
+            <Link as={RouterLink} to="/upload" color="gray.600" fontWeight="medium">
+              Upload Excel
+            </Link>
+          )}
           <Link as={RouterLink} to="/update-weekly-score" color="gray.600" fontWeight="medium">
             Update Scores
           </Link>
