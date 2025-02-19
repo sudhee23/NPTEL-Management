@@ -242,22 +242,7 @@ function Dashboard() {
                 Not Submitted: {notSubmittedCount} ({Math.round((notSubmittedCount / (payload[0].value + notSubmittedCount)) * 100)}%)
               </Text>
             </VStack>
-            {notSubmittedCount > 0 && (
-              <Button
-                size="sm"
-                colorScheme="red"
-                leftIcon={<InfoIcon />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewUnsubmitted(label);
-                }}
-                isDisabled={!filters.courseId}
-                _hover={{ transform: 'translateY(-2px)' }}
-                transition="all 0.2s"
-              >
-                View Unsubmitted
-              </Button>
-            )}
+         
           </VStack>
         </Card>
       );
