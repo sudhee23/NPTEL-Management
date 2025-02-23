@@ -7,6 +7,7 @@ import StudentList from './components/StudentList';
 import UploadExcel from './components/UploadExcel';
 import UpdateWeeklyScore from './components/UpdateWeeklyScore';
 import Login from './components/Login';
+import Stats from './components/Stats';
 
 
 // Protected Route Component
@@ -63,6 +64,16 @@ function App() {
             <ProtectedRoute>
               <Box p={8}>
                 <UpdateWeeklyScore />
+              </Box>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute>
+              <Box p={8}>
+                <Stats />
               </Box>
             </ProtectedRoute>
           }

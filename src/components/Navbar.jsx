@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Flex, Link, Heading, useToast, Button } from '@chakra-ui/react';
+import { Box, Flex, Link, Heading, useToast, Button, HStack } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as ChakraLink } from '@chakra-ui/react';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -37,6 +38,19 @@ function Navbar() {
           )}
           <Link as={RouterLink} to="/update-weekly-score" color="gray.600" fontWeight="medium">
             Upload Csv
+          </Link>
+          <Link 
+            as={RouterLink} 
+            to="/stats"
+            px={2}
+            py={1}
+            rounded={'md'}
+            _hover={{
+              textDecoration: 'none',
+              bg: 'gray.200',
+            }}
+          >
+            Stats
           </Link>
           <Button 
             onClick={handleLogout} 
