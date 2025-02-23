@@ -36,7 +36,7 @@ function Navbar() {
             </Link>
           )}
           <Link as={RouterLink} to="/update-weekly-score" color="gray.600" fontWeight="medium">
-            Update Scores
+            Upload Csv
           </Link>
           <Button 
             onClick={handleLogout} 

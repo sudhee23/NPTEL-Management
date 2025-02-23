@@ -8,6 +8,7 @@ import UploadExcel from './components/UploadExcel';
 import UpdateWeeklyScore from './components/UpdateWeeklyScore';
 import Login from './components/Login';
 
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -66,6 +67,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+       
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Box>
