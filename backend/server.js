@@ -14,8 +14,13 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Routes
-app.use('/api/students', studentRoutes);  // This will make all routes available under /api/students
+// Mount routes
+app.use('/api/students', studentRoutes);
+
+// Add a test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working' });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

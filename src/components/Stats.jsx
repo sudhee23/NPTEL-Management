@@ -22,7 +22,7 @@ import {
   AlertIcon,
   useToast
 } from '@chakra-ui/react';
-import axios from 'axios';
+import api, { endpoints } from '../utils/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 const Stats = () => {
@@ -60,12 +60,12 @@ const Stats = () => {
         setError(null);
         
         // First fetch all students
-        const studentsResponse = await axios.get(`${API_BASE_URL}/students`);
+        const studentsResponse = await api.get(endpoints.students);
         const fetchedStudents = studentsResponse.data;
         setAllStudents(fetchedStudents);
         
         // Now fetch course stats
-        const courseStatsResponse = await axios.get(`${API_BASE_URL}/students/courses/stats`);
+        const courseStatsResponse = await api.get(endpoints.courseStats);
         console.log('Course stats response:', courseStatsResponse.data);
         
         if (!courseStatsResponse.data.courses || courseStatsResponse.data.courses.length === 0) {

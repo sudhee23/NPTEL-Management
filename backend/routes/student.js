@@ -1,11 +1,22 @@
-// Get all courses statistics
+const express = require('express');
+const router = express.Router();
+const Student = require('../models/Student');
+const logger = require('../utils/logger');
+
+// Get all students
+router.get('/', async (req, res) => {
+  try {
+    const students = await Student.find();
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get course statistics
 router.get('/courses/stats', async (req, res) => {
   try {
     logger.general('Fetching course statistics...');
-
-    // First, get all courses to check what's available
-    const allCourses = await Student.distinct('courses.courseId');
-    logger.general('All available courses:', allCourses);
 
     // Get all unique courses and their details
     const courses = await Student.aggregate([
@@ -21,8 +32,7 @@ router.get('/courses/stats', async (req, res) => {
       { $sort: { '_id': 1 } }
     ]);
 
-    // Process courses and group by type and branch
-    const courseStats = await Promise.all(courses.map(async (course) => {
+    const courseStats = courses.map(course => {
       const courseId = course._id;
       const [type, branchWithNum] = courseId.split('-');
       const branch = branchWithNum?.replace(/\d+/g, '').toUpperCase();
@@ -34,7 +44,7 @@ router.get('/courses/stats', async (req, res) => {
         type: type.toUpperCase(),
         totalEnrollments: course.totalEnrollments
       };
-    }));
+    });
 
     res.json({
       totalCourses: courseStats.length,
@@ -45,4 +55,8 @@ router.get('/courses/stats', async (req, res) => {
     logger.error('Error fetching course statistics:', error);
     res.status(500).json({ error: error.message });
   }
-}); 
+});
+
+// ... other routes ...
+
+module.exports = router; 
