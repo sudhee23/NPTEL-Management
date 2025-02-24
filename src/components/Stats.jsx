@@ -50,9 +50,6 @@ const Stats = () => {
   // Update selected week to be null initially
   const [selectedWeek, setSelectedWeek] = useState('');
 
-  // Use Vite's environment variable syntax
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://nptel-management-backend.onrender.com/api/students/courses/stats';
-
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -61,6 +58,7 @@ const Stats = () => {
         
         // First fetch all students
         const studentsResponse = await api.get(endpoints.students);
+        console.log('Students response:', studentsResponse.data);
         const fetchedStudents = studentsResponse.data;
         setAllStudents(fetchedStudents);
         
@@ -68,17 +66,50 @@ const Stats = () => {
         const courseStatsResponse = await api.get(endpoints.courseStats);
         console.log('Course stats response:', courseStatsResponse.data);
         
-        if (!courseStatsResponse.data.courses || courseStatsResponse.data.courses.length === 0) {
-          throw new Error('No courses found');
+        if (!courseStatsResponse.data.courses) {
+          throw new Error('Invalid response format - missing courses data');
         }
 
         // Format courses for dropdown
-        const formattedCourses = courseStatsResponse.data.courses.map(course => ({
-          ...course,
-          displayName: course.courseName 
-            ? `${course.courseName} (${course.courseId.toUpperCase()})`
-            : `Course ${course.courseId.toUpperCase()}`
-        }));
+        const formattedCourses = courseStatsResponse.data.courses.map(course => {
+          // Define course names mapping
+          const courseNames = {
+            'noc25-ce04': 'Air Pollution and Control',
+            'noc25-ee25': 'Digital VLSI Testing',
+            'noc25-cs43': 'Introduction To Industry 4.0 And Industrial Internet Of Things',
+            'noc25-ee76': 'Sensors and Actuators',
+            'noc25-ch40': 'Renewable Energy Engineering: Solar, Wind And Biomass Energy Systems',
+            'noc25-mm17': 'Introduction to Materials Science and Engineering',
+            'noc25-ch06': 'Aspen Plus Simulation Software - A Basic Course for Chemical Engineers',
+            'noc25-ch37': 'Physico-chemical Processes for Wastewater Treatment',
+            'noc25-cs11': 'Cloud Computing',
+            'noc25-cs21': 'Deep Learning - IIT Ropar',
+            'noc25-ee83': 'VLSI Physical Design with Timing Analysis',
+            'noc25-ee48': 'Microprocessors and Interfacing',
+            'noc25-ee31': 'Embedded Sensing, Actuation and Interfacing System Design',
+            'noc25-ee77': 'Signal Processing Techniques And Its Applications',
+            'noc25-ee43': 'Integrated Circuits and Applications',
+            'noc25-mm31': 'Welding Processes',
+            'noc25-de02': 'Fundamentals of Automotive Systems',
+            'noc25-ee79': 'Smart Grid: Basics to Advanced Technologies',
+            'noc25-ce38': 'Maintenance and Repair of Concrete Structures',
+            'noc25-ge11': 'Entrepreneurship Essentials',
+            'noc25-cs52': 'Object Oriented System Development Using UML, Java And Patterns',
+            'noc25-de07': 'Understanding Incubation and Entrepreneurship',
+            'noc25-cs49': 'Machine Learning for Engineering and Science Applications',
+            'noc25-de04': 'Strategies for Sustainable Design',
+            'noc25-me67': 'Product Design and Manufacturing',
+            'noc25-cs25': 'Digital Design with Verilog'
+          };
+
+          const courseName = courseNames[course.courseId.toLowerCase()] || course.courseName;
+          
+          return {
+            ...course,
+            courseName,
+            displayName: `${courseName} (${course.courseId.toUpperCase()})`
+          };
+        });
 
         setCourses(formattedCourses);
 
@@ -198,9 +229,10 @@ const Stats = () => {
 
         setOverallWeeklyStats(processedWeeklyStats);
       } catch (error) {
-        console.error('Detailed error:', error);
+        console.error('API Error:', error);
+        console.error('Error response:', error.response);
         const errorMessage = error.response 
-          ? `Server error: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`
+          ? `Server error: ${error.response.status} - ${error.response.data?.error || error.response.statusText}`
           : error.request 
             ? 'Network error - No response from server'
             : error.message;
@@ -309,8 +341,15 @@ const Stats = () => {
   console.log('Current courses state:', courses);
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <Stack spacing={6}>
+    <Container 
+      maxW="container.xl" 
+      py={8} 
+      px={{ base: 2, md: 8 }}
+    >
+      <Stack 
+        spacing={{ base: 4, md: 8 }} 
+        width="100%"
+      >
         <Heading size="lg" mb={4}>Course Statistics</Heading>
 
         {loading && (
@@ -333,8 +372,8 @@ const Stats = () => {
         {/* Overall Stats Section - Always visible */}
         <Box>
           <Heading size="md" mb={4}>Overall Statistics</Heading>
-          <SimpleGrid columns={{ base: 1, md: 4 }} spacing={4}>
-            <Card>
+          <SimpleGrid columns={{ base: 1, md: 4 }} spacing={{ base: 4, md: 6 }}>
+            <Card width="100%">
               <CardBody>
                 <Stat>
                   <StatLabel>Total Courses</StatLabel>
@@ -342,7 +381,7 @@ const Stats = () => {
                 </Stat>
               </CardBody>
             </Card>
-            <Card>
+            <Card width="100%">
               <CardBody>
                 <Stat>
                   <StatLabel>Total Students</StatLabel>
@@ -350,7 +389,7 @@ const Stats = () => {
                 </Stat>
               </CardBody>
             </Card>
-            <Card>
+            <Card width="100%">
               <CardBody>
                 <Stat>
                   <StatLabel>Total Submissions</StatLabel>
@@ -361,7 +400,7 @@ const Stats = () => {
                 </Stat>
               </CardBody>
             </Card>
-            <Card>
+            <Card width="100%">
               <CardBody>
                 <Stat>
                   <StatLabel>Average Submission Rate</StatLabel>
@@ -523,8 +562,7 @@ const Stats = () => {
         </Box>
 
         {/* Course Selection */}
-        <Box>
-          <Heading size="md" mb={4}>Course Details</Heading>
+        <Box width="100%" px={{ base: 4, md: 0 }}>
           <FormControl>
             <FormLabel>Select Course</FormLabel>
             <Select 
@@ -532,9 +570,40 @@ const Stats = () => {
               value={selectedCourse || ''}
               onChange={(e) => setSelectedCourse(e.target.value)}
               isDisabled={loading || courses.length === 0}
+              size={{ base: "md", md: "md" }}
+              maxHeight="60px"
+              overflowY="auto"
+              sx={{
+                '@media screen and (max-width: 48em)': {
+                  // Custom styles for mobile
+                  '& option': {
+                    fontSize: 'sm',
+                    padding: '8px',
+                    whiteSpace: 'normal', // Allow text wrapping
+                    wordBreak: 'break-word'
+                  },
+                  '&::-webkit-scrollbar': {
+                    width: '4px'
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: '#f1f1f1'
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: '#888',
+                    borderRadius: '2px'
+                  }
+                }
+              }}
             >
               {courses.map((course) => (
-                <option key={course.courseId} value={course.courseId}>
+                <option 
+                  key={course.courseId} 
+                  value={course.courseId}
+                  style={{
+                    padding: '8px',
+                    fontSize: '14px'
+                  }}
+                >
                   {course.displayName}
                 </option>
               ))}
@@ -545,7 +614,12 @@ const Stats = () => {
         {/* Selected Course Stats - Only visible when course is selected */}
         {selectedCourse && courseStats && (
           <Box>
-            <Heading size="md" mb={4}>Course Specific Statistics</Heading>
+            <Heading size="md" mb={4}>
+              {courses.find(c => c.courseId === selectedCourse)?.courseName || 'Course Details'}
+            </Heading>
+            <Text color="gray.600" mb={4}>
+              Course ID: {selectedCourse.toUpperCase()}
+            </Text>
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
               {/* Overall Stats */}
               <Card>
@@ -580,9 +654,13 @@ const Stats = () => {
         {selectedCourse && courseStats && (
           <Box>
             <Heading size="md" mb={4}>Weekly Statistics</Heading>
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+            <SimpleGrid 
+              columns={{ base: 1, md: 3 }} 
+              spacing={{ base: 4, md: 6 }}
+              width="100%"
+            >
               {courseStats.weeklyStats.map((week, index) => (
-                <Card key={week.week}>
+                <Card key={week.week} width="100%">
                   <CardHeader>
                     <Heading size="md">Week {index + 1}</Heading>
                   </CardHeader>

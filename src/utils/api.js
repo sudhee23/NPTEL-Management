@@ -10,6 +10,20 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+    return Promise.reject(error);
+  }
+);
+
 export const endpoints = {
   students: '/students',
   courseStats: '/students/courses/stats',

@@ -9,16 +9,16 @@ router.get('/', async (req, res) => {
     const students = await Student.find();
     res.json(students);
   } catch (error) {
+    logger.error('Error fetching students:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Get course statistics
+// Get course statistics - moved to root level of /courses/stats
 router.get('/courses/stats', async (req, res) => {
   try {
     logger.general('Fetching course statistics...');
 
-    // Get all unique courses and their details
     const courses = await Student.aggregate([
       { $unwind: '$courses' },
       {
@@ -46,6 +46,7 @@ router.get('/courses/stats', async (req, res) => {
       };
     });
 
+    logger.general(`Found ${courseStats.length} courses`);
     res.json({
       totalCourses: courseStats.length,
       courses: courseStats
