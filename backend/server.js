@@ -14,8 +14,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Routes - Update the base path to match frontend expectations
-app.use('/api', studentRoutes);  // This will handle all /api/* routes
+// Routes
+app.use('/api/students', studentRoutes);  // This will make all routes available under /api/students
 
 // Error handling middleware
 app.use((err, req, res, next) => {

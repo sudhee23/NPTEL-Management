@@ -60,21 +60,28 @@ const Stats = () => {
         setError(null);
         
         // First fetch all students
-        const studentsResponse = await axios.get(`${API_BASE_URL}/students`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          timeout: 10000 // 10 second timeout
-        });
-
-        if (!studentsResponse.data) {
-          throw new Error('No data received from server');
-        }
-
+        const studentsResponse = await axios.get(`${API_BASE_URL}/students`);
         const fetchedStudents = studentsResponse.data;
-        console.log('Fetched students:', fetchedStudents); // Debug log
         setAllStudents(fetchedStudents);
         
+        // Now fetch course stats
+        const courseStatsResponse = await axios.get(`${API_BASE_URL}/students/courses/stats`);
+        console.log('Course stats response:', courseStatsResponse.data);
+        
+        if (!courseStatsResponse.data.courses || courseStatsResponse.data.courses.length === 0) {
+          throw new Error('No courses found');
+        }
+
+        // Format courses for dropdown
+        const formattedCourses = courseStatsResponse.data.courses.map(course => ({
+          ...course,
+          displayName: course.courseName 
+            ? `${course.courseName} (${course.courseId.toUpperCase()})`
+            : `Course ${course.courseId.toUpperCase()}`
+        }));
+
+        setCourses(formattedCourses);
+
         // Initialize counters with better tracking
         let totalSubmissions = 0;
         let totalStudents = new Set();
@@ -141,90 +148,55 @@ const Stats = () => {
           submissions: submissionsByBranch.get('EE') || 0
         });
 
-        // Now fetch course stats
-        const response = await axios.get(`${API_BASE_URL}/students/courses/stats`);
-        console.log('Full API Response:', response.data);
-        
-        if (!response.data.courses || response.data.courses.length === 0) {
-          console.log('No courses found in response');
-          setError('No NOC26-B courses found. Please check if courses are uploaded with correct course IDs.');
-          toast({
-            title: 'No courses found',
-            description: 'No NOC26-B courses are available. Please check if courses are uploaded correctly.',
-            status: 'warning',
-            duration: 5000,
-            isClosable: true,
-          });
-          setCourses([]);
-        } else {
-          console.log('Found courses:', response.data.courses);
-          
-          // Format courses for dropdown
-          const formattedCourses = response.data.courses.map(course => ({
-            ...course,
-            displayName: course.courseName 
-              ? `${course.courseName} (${course.courseId.toUpperCase()})`
-              : `Course ${course.courseId.toUpperCase()}`  // Fallback if no course name
-          }));
-          setCourses(formattedCourses);
+        // Calculate weekly stats
+        const weeklyStats = Array.from({ length: 12 }, (_, i) => ({
+          week: `Week ${i + 1}`,
+          submitted: 0,
+          unsubmitted: 0,
+          total: 0
+        }));
 
-          // Calculate weekly stats
-          const weeklyStats = Array.from({ length: 12 }, (_, i) => ({
-            week: `Week ${i + 1}`,
-            submitted: 0,
-            unsubmitted: 0,
-            total: 0
-          }));
-
-          // Process each student's submissions
-          fetchedStudents.forEach(student => {
-            student.courses?.forEach(course => {
-              course.results?.forEach(result => {
-                // Extract week number from the result
-                const weekMatch = result.week.match(/Week (\d+)/);
-                if (weekMatch) {
-                  const weekIndex = parseInt(weekMatch[1]) - 1;
-                  if (weekIndex >= 0 && weekIndex < 12) {
-                    weeklyStats[weekIndex].total++;
-                    if (result.score > 0) {
-                      weeklyStats[weekIndex].submitted++;
-                    } else {
-                      weeklyStats[weekIndex].unsubmitted++;
-                    }
+        // Process each student's submissions
+        fetchedStudents.forEach(student => {
+          student.courses?.forEach(course => {
+            course.results?.forEach(result => {
+              // Extract week number from the result
+              const weekMatch = result.week.match(/Week (\d+)/);
+              if (weekMatch) {
+                const weekIndex = parseInt(weekMatch[1]) - 1;
+                if (weekIndex >= 0 && weekIndex < 12) {
+                  weeklyStats[weekIndex].total++;
+                  if (result.score > 0) {
+                    weeklyStats[weekIndex].submitted++;
+                  } else {
+                    weeklyStats[weekIndex].unsubmitted++;
                   }
                 }
-              });
+              }
             });
           });
-
-          // Calculate submission rates
-          const processedWeeklyStats = weeklyStats.map(week => ({
-            ...week,
-            submissionRate: week.total > 0 
-              ? ((week.submitted / week.total) * 100).toFixed(2)
-              : '0'
-          }));
-
-          console.log('Weekly Stats:', processedWeeklyStats);
-
-          // Update states
-          setOverallStats({
-            totalStudents: totalStudents.size,
-            totalCourses: formattedCourses.length,
-            totalSubmissions,
-            averageSubmissionRate: (processedWeeklyStats.reduce((sum, week) => 
-              sum + parseFloat(week.submissionRate), 0) / 12).toFixed(2)
-          });
-
-          setOverallWeeklyStats(processedWeeklyStats);
-        }
-
-        // Log final counts
-        console.log('Stats Component Counts:', {
-          totalStudents: totalStudents.size,
-          totalSubmissions,
-          courses: courses.length
         });
+
+        // Calculate submission rates
+        const processedWeeklyStats = weeklyStats.map(week => ({
+          ...week,
+          submissionRate: week.total > 0 
+            ? ((week.submitted / week.total) * 100).toFixed(2)
+            : '0'
+        }));
+
+        console.log('Weekly Stats:', processedWeeklyStats);
+
+        // Update states
+        setOverallStats({
+          totalStudents: totalStudents.size,
+          totalCourses: formattedCourses.length,
+          totalSubmissions,
+          averageSubmissionRate: (processedWeeklyStats.reduce((sum, week) => 
+            sum + parseFloat(week.submissionRate), 0) / 12).toFixed(2)
+        });
+
+        setOverallWeeklyStats(processedWeeklyStats);
       } catch (error) {
         console.error('Detailed error:', error);
         const errorMessage = error.response 
@@ -245,6 +217,7 @@ const Stats = () => {
         setLoading(false);
       }
     };
+
     fetchCourses();
   }, [toast]);
 

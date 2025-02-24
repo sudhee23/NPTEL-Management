@@ -13,7 +13,8 @@ const api = axios.create({
 export const endpoints = {
   students: '/students',
   courseStats: '/students/courses/stats',
-  unsubmitted: (courseId) => `/students/courses/${courseId}/unsubmitted`,
+  courseDetails: (courseId) => `/students/courses/${courseId}/stats`,
+  unsubmitted: (courseId, week) => `/students/courses/${courseId}/unsubmitted?week=${week}`,
   updateScore: '/students/updateweekscore',
 };
 
