@@ -51,7 +51,7 @@ const Stats = () => {
   const [selectedWeek, setSelectedWeek] = useState('');
 
   // Use Vite's environment variable syntax
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://nptel-management-backend.onrender.com/api';
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -60,8 +60,19 @@ const Stats = () => {
         setError(null);
         
         // First fetch all students
-        const studentsResponse = await axios.get(`${API_BASE_URL}/students`);
+        const studentsResponse = await axios.get(`${API_BASE_URL}/students`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 10000 // 10 second timeout
+        });
+
+        if (!studentsResponse.data) {
+          throw new Error('No data received from server');
+        }
+
         const fetchedStudents = studentsResponse.data;
+        console.log('Fetched students:', fetchedStudents); // Debug log
         setAllStudents(fetchedStudents);
         
         // Initialize counters with better tracking
@@ -215,14 +226,16 @@ const Stats = () => {
           courses: courses.length
         });
       } catch (error) {
-        console.error('Error details:', error.response || error);
-        const errorMessage = error.response?.status === 404 
-          ? 'API endpoint not found. Please check server configuration.'
-          : error.response?.data?.message || error.message || 'Failed to fetch courses';
+        console.error('Detailed error:', error);
+        const errorMessage = error.response 
+          ? `Server error: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`
+          : error.request 
+            ? 'Network error - No response from server'
+            : error.message;
         
         setError(errorMessage);
         toast({
-          title: 'Error',
+          title: 'Error fetching data',
           description: errorMessage,
           status: 'error',
           duration: 5000,
@@ -327,10 +340,20 @@ const Stats = () => {
       <Stack spacing={6}>
         <Heading size="lg" mb={4}>Course Statistics</Heading>
 
-        {error && (
-          <Alert status="warning">
+        {loading && (
+          <Alert status="info">
             <AlertIcon />
-            {error}
+            Loading data...
+          </Alert>
+        )}
+
+        {error && (
+          <Alert status="error">
+            <AlertIcon />
+            <Box>
+              <Text fontWeight="bold">Error loading data</Text>
+              <Text fontSize="sm">{error}</Text>
+            </Box>
           </Alert>
         )}
 
