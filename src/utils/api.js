@@ -30,6 +30,7 @@ export const endpoints = {
   courseDetails: (courseId) => `/students/courses/${courseId}/stats`,
   unsubmitted: (courseId, week) => `/students/courses/${courseId}/unsubmitted?week=${week}`,
   updateScore: '/students/updateweekscore',
+  facultyCourses: '/students/faculty-courses',
 };
 
 export default api; 

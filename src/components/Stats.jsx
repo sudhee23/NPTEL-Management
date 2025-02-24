@@ -20,7 +20,13 @@ import {
   Skeleton,
   Alert,
   AlertIcon,
-  useToast
+  useToast,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td
 } from '@chakra-ui/react';
 import api, { endpoints } from '../utils/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -350,6 +356,150 @@ const Stats = () => {
         spacing={{ base: 4, md: 8 }} 
         width="100%"
       >
+        <Box>
+          <Heading size="lg" mb={6}>Overall NPTEL Data</Heading>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 4, md: 6 }}>
+            <Card width="100%" bg="blue.50">
+              <CardBody>
+                <Stat>
+                  <StatLabel fontSize="lg" color="blue.700">Total Registrations</StatLabel>
+                  <StatNumber fontSize="4xl" color="blue.600">3,017</StatNumber>
+                  <StatHelpText color="blue.600">
+                    Total NPTEL subject registrations
+                  </StatHelpText>
+                </Stat>
+              </CardBody>
+            </Card>
+
+            <Card width="100%" bg="purple.50">
+              <CardBody>
+                <Stat>
+                  <StatLabel fontSize="lg" color="purple.700">Total Courses</StatLabel>
+                  <StatNumber fontSize="4xl" color="purple.600">26</StatNumber>
+                  <StatHelpText color="purple.600">
+                    Available NPTEL courses
+                  </StatHelpText>
+                </Stat>
+              </CardBody>
+            </Card>
+
+            <Card width="100%" bg="green.50">
+              <CardBody>
+                <Stat>
+                  <StatLabel fontSize="lg" color="green.700">Total Students</StatLabel>
+                  <StatNumber fontSize="4xl" color="green.600">2,073</StatNumber>
+                  <StatHelpText color="green.600">
+                    Enrolled students
+                  </StatHelpText>
+                </Stat>
+              </CardBody>
+            </Card>
+          </SimpleGrid>
+        </Box>
+
+        <Box mt={8}>
+          <Heading size="lg" mb={6}>Branch-wise Statistics</Heading>
+          <Box 
+            overflowX="auto"
+            borderRadius="lg"
+            boxShadow="sm"
+            bg="white"
+          >
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th 
+                    bg="gray.50"
+                    borderTopLeftRadius="lg"
+                  >
+                    Branch
+                  </Th>
+                  <Th isNumeric color="blue.700">E3 Students</Th>
+                  <Th isNumeric color="blue.700">E4 Students</Th>
+                  <Th isNumeric color="green.700">Total Students</Th>
+                  <Th isNumeric color="purple.700">E3 Subjects</Th>
+                  <Th isNumeric color="purple.700">E4 Subjects</Th>
+                  <Th isNumeric color="purple.700">Total Subjects</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td fontWeight="semibold">CE</Td>
+                  <Td isNumeric>63</Td>
+                  <Td isNumeric>112</Td>
+                  <Td isNumeric fontWeight="medium">175</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>2</Td>
+                </Tr>
+                <Tr>
+                  <Td fontWeight="semibold">CHE</Td>
+                  <Td isNumeric>42</Td>
+                  <Td isNumeric>86</Td>
+                  <Td isNumeric fontWeight="medium">128</Td>
+                  <Td isNumeric>3</Td>
+                  <Td isNumeric>2</Td>
+                  <Td isNumeric>3</Td>
+                </Tr>
+                <Tr>
+                  <Td fontWeight="semibold">CSE</Td>
+                  <Td isNumeric>363</Td>
+                  <Td isNumeric>356</Td>
+                  <Td isNumeric fontWeight="medium">719</Td>
+                  <Td isNumeric>2</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>3</Td>
+                </Tr>
+                <Tr>
+                  <Td fontWeight="semibold">ECE</Td>
+                  <Td isNumeric>361</Td>
+                  <Td isNumeric>350</Td>
+                  <Td isNumeric fontWeight="medium">711</Td>
+                  <Td isNumeric>9</Td>
+                  <Td isNumeric>2</Td>
+                  <Td isNumeric>11</Td>
+                </Tr>
+                <Tr>
+                  <Td fontWeight="semibold">EEE</Td>
+                  <Td isNumeric>118</Td>
+                  <Td isNumeric>69</Td>
+                  <Td isNumeric fontWeight="medium">187</Td>
+                  <Td isNumeric>2</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>3</Td>
+                </Tr>
+                <Tr>
+                  <Td fontWeight="semibold">ME</Td>
+                  <Td isNumeric>60</Td>
+                  <Td isNumeric>50</Td>
+                  <Td isNumeric fontWeight="medium">110</Td>
+                  <Td isNumeric>3</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>4</Td>
+                </Tr>
+                <Tr>
+                  <Td fontWeight="semibold">MME</Td>
+                  <Td isNumeric>25</Td>
+                  <Td isNumeric>18</Td>
+                  <Td isNumeric fontWeight="medium">43</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>1</Td>
+                  <Td isNumeric>1</Td>
+                </Tr>
+                <Tr bg="gray.50">
+                  <Td fontWeight="bold">Total</Td>
+                  <Td isNumeric fontWeight="bold">1,032</Td>
+                  <Td isNumeric fontWeight="bold">1,041</Td>
+                  <Td isNumeric fontWeight="bold">2,073</Td>
+                  <Td isNumeric fontWeight="bold">21</Td>
+                  <Td isNumeric fontWeight="bold">9</Td>
+                  <Td isNumeric fontWeight="bold">27</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </Box>
+        </Box>
+
         <Heading size="lg" mb={4}>Course Statistics</Heading>
 
         {loading && (
@@ -416,7 +566,7 @@ const Stats = () => {
 
         {/* Overall Weekly Statistics - Always visible */}
         <Box>
-          <Heading size="md" mb={4}>Overall Weekly Statistics</Heading>
+          <Heading size="md" mb={4}>Weekly Assignment Statistics</Heading>
           
           {/* Week Selection Dropdown - Move this to the top */}
           <FormControl mb={6}>
@@ -434,45 +584,54 @@ const Stats = () => {
             </Select>
           </FormControl>
 
-          {/* Bar Chart */}
-          <Box h="400px" mb={6}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={overallWeeklyStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <RechartsTooltip />
-                <Bar dataKey="submitted" name="Submitted" fill="#48BB78" />
-                <Bar dataKey="unsubmitted" name="Not Submitted" fill="#F56565" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
-
-          {/* Overall Weekly Cards */}
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={6}>
+          {/* Updated Weekly Stats Cards */}
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 4, md: 6 }}>
             {overallWeeklyStats.map((week, index) => (
-              <Card key={week.week}>
+              <Card key={week.week} width="100%">
                 <CardHeader>
                   <Heading size="md">Week {index + 1}</Heading>
                 </CardHeader>
                 <CardBody>
-                  <Stack spacing={3}>
-                    <Box>
-                      <Text color="green.500" fontWeight="medium">
-                        Submitted: {week.submitted.toLocaleString()}
+                  <Stack spacing={4}>
+                    {/* Total Mentee Data Section */}
+                    <Box borderBottom="1px" borderColor="gray.200" pb={3}>
+                      <Text fontSize="md" fontWeight="bold" color="gray.700" mb={2}>
+                        Total Mentee Data
                       </Text>
-                      <Text color="red.500" fontWeight="medium">
-                        Not Submitted: {week.unsubmitted.toLocaleString()}
+                      <Text fontSize="lg" fontWeight="semibold" color="blue.600">
+                        3,017
                       </Text>
-                      <Text color="gray.500">
-                        Total: {week.total.toLocaleString()}
+                      <Text color="red.500" fontSize="sm">
+                        Mentee Data Not Submitted: {3017 - (week.submitted + week.unsubmitted)}
                       </Text>
                     </Box>
+
+                    {/* Assignment Data Section */}
                     <Box>
-                      <Text mb={2}>Submission Rate: {week.submissionRate}%</Text>
+                      <Text fontSize="md" fontWeight="bold" color="gray.700" mb={2}>
+                        Assignment Data
+                      </Text>
+                      <Stack spacing={2}>
+                        <Text color="green.500" fontWeight="medium">
+                          Submitted: {week.submitted}
+                        </Text>
+                        <Text color="red.500" fontWeight="medium">
+                          Assignment Incomplete: {week.unsubmitted}
+                        </Text>
+                        <Text fontSize="sm" color="gray.600">
+                          Total Processed: {week.submitted + week.unsubmitted}
+                        </Text>
+                      </Stack>
+                    </Box>
+
+                    {/* Submission Rate */}
+                    <Box pt={2}>
+                      <Text mb={2}>
+                        Submission Rate: {((week.submitted / (week.submitted + week.unsubmitted)) * 100).toFixed(2)}%
+                      </Text>
                       <Progress 
-                        value={week.submissionRate} 
-                        colorScheme={week.submissionRate > 50 ? "green" : "orange"}
+                        value={((week.submitted / (week.submitted + week.unsubmitted)) * 100)} 
+                        colorScheme={week.submitted > week.unsubmitted ? "green" : "orange"}
                         borderRadius="full"
                       />
                     </Box>
@@ -481,84 +640,6 @@ const Stats = () => {
               </Card>
             ))}
           </SimpleGrid>
-
-          {/* Selected Week Details - Only show when a week is selected */}
-          {selectedWeek && overallWeeklyStats[selectedWeek - 1] && (
-            <Box>
-              <Heading size="md" mb={4}>Week {selectedWeek} Details</Heading>
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {/* Submitted Courses */}
-                <Card>
-                  <CardHeader>
-                    <Heading size="sm" color="green.500">
-                      Courses with Submissions - Week {selectedWeek}
-                    </Heading>
-                  </CardHeader>
-                  <CardBody>
-                    <Stack spacing={2}>
-                      {courses.filter(course => {
-                        const weekStats = course.weeklyStats?.[parseInt(selectedWeek) - 1];
-                        return weekStats && weekStats.submitted > 0;
-                      }).map(course => (
-                        <Box
-                          key={course.courseId}
-                          p={3}
-                          bg="green.50"
-                          borderRadius="md"
-                          _hover={{ bg: 'green.100' }}
-                        >
-                          <Text fontWeight="medium">
-                            {course.displayName || `Course ${course.courseId.toUpperCase()}`}
-                          </Text>
-                          <Text fontSize="sm" color="gray.600">
-                            Course ID: {course.courseId.toUpperCase()}
-                          </Text>
-                          <Text fontSize="sm" color="green.600">
-                            Submissions: {course.weeklyStats[parseInt(selectedWeek) - 1]?.submitted || 0}
-                          </Text>
-                        </Box>
-                      ))}
-                    </Stack>
-                  </CardBody>
-                </Card>
-
-                {/* Courses without Data */}
-                <Card>
-                  <CardHeader>
-                    <Heading size="xs" color="red.500">
-                      Pending Courses ({overallWeeklyStats[selectedWeek - 1].unsubmitted})
-                    </Heading>
-                  </CardHeader>
-                  <CardBody>
-                    <Stack spacing={2}>
-                      {courses
-                        .filter(course => 
-                          overallWeeklyStats[selectedWeek - 1].coursesWithoutData
-                            .includes(course.courseId)
-                        )
-                        .map(course => (
-                          <Box 
-                            key={course.courseId}
-                            p={2}
-                            bg="red.50"
-                            borderRadius="md"
-                            cursor="pointer"
-                            onClick={() => setSelectedCourse(course.courseId)}
-                            _hover={{ bg: 'red.100' }}
-                          >
-                            <Text fontWeight="medium">{course.displayName}</Text>
-                            <Text fontSize="sm" color="gray.600">
-                              No data for Week {selectedWeek}
-                            </Text>
-                          </Box>
-                        ))
-                      }
-                    </Stack>
-                  </CardBody>
-                </Card>
-              </SimpleGrid>
-            </Box>
-          )}
         </Box>
 
         {/* Course Selection */}
