@@ -59,10 +59,35 @@ router.get('/courses/stats', async (req, res) => {
   }
 });
 
-// Update the bulk upload route
+// Update the updateweekscore route
 router.post('/updateweekscore', upload.single('file'), async (req, res) => {
   try {
-    const { facultyName, courseId } = req.body;
+    if (!req.file) {
+      logger.error('No file received');
+      return res.status(400).json({ error: 'Please upload a CSV file' });
+    }
+
+    const filename = req.file.originalname;
+    logger.general('Processing file:', filename);
+
+    // Extract course info from filename
+    const filenameRegex = /(cs|me|ce|ee|ece|ch|ge|de|mm)(\d+)\.csv$/i;
+    const courseMatch = filename.match(filenameRegex);
+
+    if (!courseMatch) {
+      logger.error('Invalid filename format:', filename);
+      return res.status(400).json({ 
+        error: 'Filename format mismatched. Expected format: [branch code][number].csv (e.g., cs52.csv)',
+        filename 
+      });
+    }
+
+    const branch = courseMatch[1].toLowerCase();
+    const number = courseMatch[2];
+    const courseId = `noc25-${branch}${number}`;
+    logger.general('Processing for course:', courseId);
+
+    const { facultyName } = req.body;
     if (!facultyName || !courseId) {
       return res.status(400).json({ 
         message: 'Faculty name and course ID are required' 

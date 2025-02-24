@@ -357,7 +357,7 @@ const Stats = () => {
         width="100%"
       >
         <Box>
-          <Heading size="lg" mb={6}>Overall NPTEL Data</Heading>
+          <Heading size="lg" mb={6}>Dashboard</Heading>
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 4, md: 6 }}>
             <Card width="100%" bg="blue.50">
               <CardBody>

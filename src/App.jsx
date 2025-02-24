@@ -33,6 +33,16 @@ function App() {
           element={
             <ProtectedRoute>
               <Box p={8}>
+                <Stats />
+              </Box>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/course-data"
+          element={
+            <ProtectedRoute>
+              <Box p={8}>
                 <Dashboard />
               </Box>
             </ProtectedRoute>
@@ -68,17 +78,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/stats"
-          element={
-            <ProtectedRoute>
-              <Box p={8}>
-                <Stats />
-              </Box>
-            </ProtectedRoute>
-          }
-        />
-       
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Box>

@@ -46,13 +46,26 @@ function UpdateWeeklyScore() {
         isClosable: true,
       });
     } catch (error) {
-      toast({
-        title: 'Update failed',
-        description: error.response?.data?.error || 'Something went wrong',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      const errorMessage = error.response?.data?.error || 'Something went wrong';
+      
+      // Check if the error is related to filename format
+      if (errorMessage.includes('filename format')) {
+        toast({
+          title: 'Invalid Filename',
+          description: 'Please check the filename format: [branch code][number].csv (e.g., cs52.csv)',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Update failed',
+          description: errorMessage,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } finally {
       setUploading(false);
     }
@@ -93,7 +106,9 @@ function UpdateWeeklyScore() {
               : "Drag and drop a CSV file here, or click to select"}
           </Text>
           <Text color="gray.500" fontSize="sm">
-            File name should include course ID (e.g., noc123_abc12.csv)
+            File name format: [branch code][number].csv
+            <br />
+            Example: cs52.csv, me67.csv, etc.
           </Text>
         </VStack>
       </Box>

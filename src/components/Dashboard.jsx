@@ -417,8 +417,10 @@ return (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Heading size="lg" mb={2}>Dashboard Overview</Heading>
-        <Text color="gray.600">Monitor student performance and submission statistics</Text>
+        <Box>
+          <Heading size="lg" mb={6}>Course Data</Heading>
+          <Text color="gray.600">Monitor student performance and submission statistics</Text>
+        </Box>
       </MotionBox>
 
       {/* Filters */}

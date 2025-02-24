@@ -55,6 +55,9 @@ function Navbar() {
           <Link as={RouterLink} to="/" color="gray.600" fontWeight="medium">
             Dashboard
           </Link>
+          <Link as={RouterLink} to="/course-data" color="gray.600" fontWeight="medium">
+            Course Data
+          </Link>
           <Link as={RouterLink} to="/students" color="gray.600" fontWeight="medium">
             Students
           </Link>
@@ -65,9 +68,6 @@ function Navbar() {
           )}
           <Link as={RouterLink} to="/update-weekly-score" color="gray.600" fontWeight="medium">
             Upload Csv
-          </Link>
-          <Link as={RouterLink} to="/stats" color="gray.600" fontWeight="medium">
-            Stats
           </Link>
           <Button onClick={handleLogout} colorScheme="red" size="sm">
             Logout
@@ -96,6 +96,16 @@ function Navbar() {
             _hover={{ bg: 'gray.50' }}
           >
             Dashboard
+          </Link>
+          <Link 
+            as={RouterLink} 
+            to="/course-data" 
+            color="gray.600" 
+            fontWeight="medium"
+            p={2}
+            _hover={{ bg: 'gray.50' }}
+          >
+            Course Data
           </Link>
           <Link 
             as={RouterLink} 
@@ -128,16 +138,6 @@ function Navbar() {
             _hover={{ bg: 'gray.50' }}
           >
             Upload Csv
-          </Link>
-          <Link 
-            as={RouterLink} 
-            to="/stats" 
-            color="gray.600" 
-            fontWeight="medium"
-            p={2}
-            _hover={{ bg: 'gray.50' }}
-          >
-            Stats
           </Link>
           <Box p={2}>
             <Button 
