@@ -51,7 +51,7 @@ const Stats = () => {
   const [selectedWeek, setSelectedWeek] = useState('');
 
   // Use Vite's environment variable syntax
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://nptel-management-backend.onrender.com/api';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://nptel-management-backend.onrender.com/api/students/courses/stats';
 
   useEffect(() => {
     const fetchCourses = async () => {
