@@ -408,12 +408,7 @@ const Stats = () => {
             <Table variant="simple">
               <Thead>
                 <Tr>
-                  <Th 
-                    bg="gray.50"
-                    borderTopLeftRadius="lg"
-                  >
-                    Branch
-                  </Th>
+                  <Th bg="gray.50" borderTopLeftRadius="lg">Branch</Th>
                   <Th isNumeric color="blue.700">E3 Students</Th>
                   <Th isNumeric color="blue.700">E4 Students</Th>
                   <Th isNumeric color="green.700">Total Students</Th>
@@ -439,7 +434,7 @@ const Stats = () => {
                   <Td isNumeric fontWeight="medium">128</Td>
                   <Td isNumeric>3</Td>
                   <Td isNumeric>2</Td>
-                  <Td isNumeric>3</Td>
+                  <Td isNumeric>5</Td>
                 </Tr>
                 <Tr>
                   <Td fontWeight="semibold">CSE</Td>
@@ -484,7 +479,7 @@ const Stats = () => {
                   <Td isNumeric fontWeight="medium">43</Td>
                   <Td isNumeric>1</Td>
                   <Td isNumeric>1</Td>
-                  <Td isNumeric>1</Td>
+                  <Td isNumeric>2</Td>
                 </Tr>
                 <Tr bg="gray.50">
                   <Td fontWeight="bold">Total</Td>
@@ -493,7 +488,7 @@ const Stats = () => {
                   <Td isNumeric fontWeight="bold">2,073</Td>
                   <Td isNumeric fontWeight="bold">21</Td>
                   <Td isNumeric fontWeight="bold">9</Td>
-                  <Td isNumeric fontWeight="bold">27</Td>
+                  <Td isNumeric fontWeight="bold">30</Td>
                 </Tr>
               </Tbody>
             </Table>
