@@ -26,7 +26,8 @@ import {
   Tr,
   Th,
   Tbody,
-  Td
+  Td,
+  Button
 } from '@chakra-ui/react';
 import api, { endpoints } from '../utils/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -57,22 +58,29 @@ const Stats = () => {
   const [selectedWeek, setSelectedWeek] = useState('');
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchCourses = async (retryCount = 0) => {
       try {
         setLoading(true);
         setError(null);
         
-        // First fetch all students
-        const studentsResponse = await api.get(endpoints.students);
-        console.log('Students response:', studentsResponse.data);
+        // First fetch all students with increased timeout
+        const studentsResponse = await api.get(endpoints.students, {
+          timeout: 30000 // Increase timeout to 30 seconds
+        });
+        
+        if (!studentsResponse.data) {
+          throw new Error('No data received from server');
+        }
+
         const fetchedStudents = studentsResponse.data;
         setAllStudents(fetchedStudents);
         
-        // Now fetch course stats
-        const courseStatsResponse = await api.get(endpoints.courseStats);
-        console.log('Course stats response:', courseStatsResponse.data);
-        
-        if (!courseStatsResponse.data.courses) {
+        // Now fetch course stats with increased timeout
+        const courseStatsResponse = await api.get(endpoints.courseStats, {
+          timeout: 30000 // Increase timeout to 30 seconds
+        });
+
+        if (!courseStatsResponse.data || !courseStatsResponse.data.courses) {
           throw new Error('Invalid response format - missing courses data');
         }
 
@@ -236,12 +244,31 @@ const Stats = () => {
         setOverallWeeklyStats(processedWeeklyStats);
       } catch (error) {
         console.error('API Error:', error);
-        console.error('Error response:', error.response);
-        const errorMessage = error.response 
-          ? `Server error: ${error.response.status} - ${error.response.data?.error || error.response.statusText}`
-          : error.request 
-            ? 'Network error - No response from server'
-            : error.message;
+        
+        // If it's a timeout error and we haven't retried too many times
+        if (error.code === 'ECONNABORTED' && retryCount < 3) {
+          console.log(`Retrying... Attempt ${retryCount + 1}`);
+          toast({
+            title: 'Connection timeout',
+            description: 'Retrying to fetch data...',
+            status: 'info',
+            duration: 3000,
+            isClosable: true,
+          });
+          
+          // Wait for 2 seconds before retrying
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return fetchCourses(retryCount + 1);
+        }
+
+        // If we've exhausted retries or it's a different error
+        const errorMessage = error.code === 'ECONNABORTED' 
+          ? 'Server is taking too long to respond. Please try again later.'
+          : error.response 
+            ? `Server error: ${error.response.status} - ${error.response.data?.error || error.response.statusText}`
+            : error.request 
+              ? 'Network error - No response from server'
+              : error.message;
         
         setError(errorMessage);
         toast({
@@ -507,10 +534,18 @@ const Stats = () => {
         {error && (
           <Alert status="error">
             <AlertIcon />
-            <Box>
+            <Box flex="1">
               <Text fontWeight="bold">Error loading data</Text>
               <Text fontSize="sm">{error}</Text>
             </Box>
+            <Button
+              size="sm"
+              colorScheme="red"
+              onClick={() => fetchCourses()}
+              ml={3}
+            >
+              Retry
+            </Button>
           </Alert>
         )}
 
