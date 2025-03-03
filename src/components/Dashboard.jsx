@@ -146,51 +146,41 @@ function Dashboard() {
     fetchStudents();
   }, []);
 
-  // Separate effect for filter updates
   useEffect(() => {
     if (students.length > 0) {
       updateStats(students);
     }
-  }, [filters, students]); // Run when filters or students change
+  }, [filters, students]);
 
   const updateStats = (studentsData) => {
-    // First filter students by branch and year
     const filteredStudents = studentsData.filter(student => {
       const branchMatch = !filters.branch || student.branch === filters.branch;
       const yearMatch = !filters.year || student.year === filters.year;
       return branchMatch && yearMatch;
     });
   
-    // Create maps to store course enrollments per branch
     const branchEnrollments = {};
     const branchUniqueStudents = {};
     
-    // Process each student and their courses
     filteredStudents.forEach(student => {
       student.courses?.forEach(course => {
-        // Extract branch from course ID (e.g., 'noc25-cs52' -> 'CS')
         const branch = course.courseId.split('-')[1]?.replace(/\d+/g, '').toUpperCase();
         
-        // Initialize branch counters if they don't exist
         if (!branchEnrollments[branch]) {
           branchEnrollments[branch] = 0;
           branchUniqueStudents[branch] = new Set();
         }
         
-        // Count each course enrollment
         branchEnrollments[branch]++;
-        // Add student ID to track unique students
         branchUniqueStudents[branch].add(student._id.toString());
       });
     });
   
-    // Calculate total unique students across all branches
     const allUniqueStudents = new Set();
     Object.values(branchUniqueStudents).forEach(studentSet => {
       studentSet.forEach(studentId => allUniqueStudents.add(studentId));
     });
   
-    // Calculate weekly stats
     let weeklyStats = calculateWeeklyStats(
       filteredStudents,
       filters.courseId,
@@ -201,16 +191,14 @@ function Dashboard() {
       weeklyStats = weeklyStats.filter(stat => stat.week === filters.week);
     }
   
-    // Convert branch stats to include both enrollments and unique students
     const branchStats = {};
     Object.entries(branchEnrollments).forEach(([branch, enrollments]) => {
       branchStats[branch] = {
-        totalStudents: enrollments, // Total course enrollments
-        uniqueStudents: branchUniqueStudents[branch].size // Unique students count
+        totalStudents: enrollments,
+        uniqueStudents: branchUniqueStudents[branch].size
       };
     });
   
-    // Update stats with both enrollment and unique student counts
     setStats({
       totalStudents: allUniqueStudents.size,
       branchStats,
@@ -226,7 +214,6 @@ function Dashboard() {
       }
     });
   
-    // Log the detailed counts for verification
     console.log('Statistics:', {
       totalUniqueStudents: allUniqueStudents.size,
       branchDistribution: Object.fromEntries(
@@ -246,7 +233,6 @@ function Dashboard() {
 const calculateWeeklyStats = (students, courseId, facultyName) => {
   const weeklyData = {};
   
-  // First, initialize all weeks with zero counts
   students.forEach(student => {
     student.courses?.forEach(course => {
       course.results?.forEach(result => {
@@ -257,9 +243,7 @@ const calculateWeeklyStats = (students, courseId, facultyName) => {
     });
   });
 
-  // Then count submissions for filtered students
   students.forEach(student => {
-    // Apply branch and year filters
     if ((filters.branch && student.branch !== filters.branch) ||
         (filters.year && student.year !== filters.year)) {
       return;
@@ -298,7 +282,7 @@ const calculateWeeklyStats = (students, courseId, facultyName) => {
     }))
     .sort((a, b) => {
       const weekA = parseInt(a.week.match(/\d+/)[0]);
-      const weekB = parseInt(b.week.match(/\d+/)[0]);
+      const weekB = parseInt(b.match(/\d+/)[0]);
       return weekA - weekB;
     });
 };
@@ -324,7 +308,7 @@ const resetFilters = () => {
 };
 
 const handleViewUnsubmitted = async (weekData) => {
-  console.log("Week Data:", weekData); // Debug log
+  console.log("Week Data:", weekData);
   
   if (!filters.courseId) {
     toast({
@@ -343,7 +327,6 @@ const handleViewUnsubmitted = async (weekData) => {
 
   try {
     setLoading(true);
-    // Log the request parameters
     console.log("Request params:", {
       week: weekData,
       courseId: filters.courseId,
@@ -362,7 +345,7 @@ const handleViewUnsubmitted = async (weekData) => {
       }
     });
     
-    console.log("API Response:", response.data); // Debug log
+    console.log("API Response:", response.data);
     
     if (response.data) {
       setSelectedWeek(weekData);
@@ -402,7 +385,6 @@ const CustomTooltip = ({ active, payload, label }) => {
               Not Submitted: {notSubmittedCount} ({Math.round((notSubmittedCount / (payload[0].value + notSubmittedCount)) * 100)}%)
             </Text>
           </VStack>
-       
         </VStack>
       </Card>
     );
@@ -423,7 +405,6 @@ return (
         </Box>
       </MotionBox>
 
-      {/* Filters */}
       <MotionCard
         variant="outline"
         initial={{ opacity: 0, y: -20 }}
@@ -471,10 +452,8 @@ return (
         </CardBody>
       </MotionCard>
 
-      {/* Weekly Stats Cards */}
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
         {loading ? (
-          // Loading skeletons
           Array.from({ length: 12 }).map((_, index) => (
             <MotionCard
               key={`skeleton-${index}`}
@@ -504,7 +483,6 @@ return (
             </MotionCard>
           ))
         ) : (
-          // Actual weekly stats cards
           stats.weeklyStats
             .filter(week => !week.week.includes('Week 0'))
             .map((week, index) => (
@@ -559,7 +537,6 @@ return (
         )}
       </SimpleGrid>
 
-      {/* Unsubmitted Students Modal */}
       <Modal 
         isOpen={isOpen} 
         onClose={onClose} 
