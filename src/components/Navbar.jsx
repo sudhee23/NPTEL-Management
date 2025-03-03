@@ -131,6 +131,9 @@ function Navbar() {
             spacing={4}
             borderTop="1px"
             borderColor="gray.200"
+            alignItems="center"
+            textAlign="center"
+            w="full"
           >
             <Link 
               as={RouterLink} 
@@ -138,7 +141,9 @@ function Navbar() {
               color="gray.700" 
               fontWeight="medium"
               p={2}
-              textAlign="center"
+              w="full"
+              display="flex"
+              justifyContent="center"
               borderRadius="md"
               _hover={{ bg: 'blue.50', color: 'blue.500', textDecoration: 'none' }}
               transition="all 0.2s"
@@ -152,7 +157,9 @@ function Navbar() {
               color="gray.700" 
               fontWeight="medium"
               p={2}
-              textAlign="center"
+              w="full"
+              display="flex"
+              justifyContent="center"
               borderRadius="md"
               _hover={{ bg: 'blue.50', color: 'blue.500', textDecoration: 'none' }}
               transition="all 0.2s"
@@ -167,7 +174,9 @@ function Navbar() {
                 color="gray.700" 
                 fontWeight="medium"
                 p={2}
-                textAlign="center"
+                w="full"
+                display="flex"
+                justifyContent="center"
                 borderRadius="md"
                 _hover={{ bg: 'blue.50', color: 'blue.500', textDecoration: 'none' }}
                 transition="all 0.2s"
@@ -182,7 +191,9 @@ function Navbar() {
               color="gray.700" 
               fontWeight="medium"
               p={2}
-              textAlign="center"
+              w="full"
+              display="flex"
+              justifyContent="center"
               borderRadius="md"
               _hover={{ bg: 'blue.50', color: 'blue.500', textDecoration: 'none' }}
               transition="all 0.2s"
@@ -190,7 +201,7 @@ function Navbar() {
             >
               Upload Csv
             </Link>
-            <Box p={2}>
+            <Box p={2} w="full">
               <Button 
                 onClick={() => {
                   handleLogout();
