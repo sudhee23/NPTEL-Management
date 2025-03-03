@@ -107,7 +107,7 @@ function Navbar() {
           >
             Faculty Stats
           </Link>
-          <Link 
+          {/* <Link 
             as={RouterLink} 
             to="/students" 
             color="gray.600" 
@@ -117,7 +117,7 @@ function Navbar() {
             onClick={onToggle}
           >
             Students
-          </Link>
+          </Link> */}
           {isAdmin && (
             <Link 
               as={RouterLink} 
