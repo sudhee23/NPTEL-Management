@@ -1,68 +1,106 @@
 import React from 'react';
-import { Box, Text, VStack, Stack } from '@chakra-ui/react';
+import { Box, Text, VStack, Stack, Container, Divider } from '@chakra-ui/react';
 
 const Footer = () => {
+  const names = [
+    ["Siddhartha (N200081)", "Satya Vamsi (N200346)", "Bhanu Vara Prasad (N200532)"],
+    ["KMS Sudheer (N200715)", "Dheeraj (N200800)"]
+  ];
+
   return (
     <Box 
       as="footer" 
-      py={{ base: 4, md: 8 }}
-      px={{ base: 3, md: 8 }} 
-      bg="gray.50" 
-      borderTop="1px" 
-      borderColor="gray.200"
+      bg="gray.800" 
+      color="white"
+      py={{ base: 8, md: 12 }}
       mt="auto"
-      boxShadow="0 -2px 10px rgba(0,0,0,0.05)"
     >
-      <VStack 
-        spacing={{ base: 4, md: 4 }} 
-        maxW="container.xl" 
-        mx="auto"
-      >
-        <Text 
-          fontSize={{ base: "md", md: "md" }}
-          color="black" 
-          textAlign="center"
-          fontWeight="medium"
-          letterSpacing="wide"
-          px={{ base: 2, md: 0 }}
-        >
-          Developed by students of RGUKT-Nuzvid CSE Department
-        </Text>
-        
-        <Stack 
-          direction={{ base: "column", md: "row" }}
-          spacing={{ base: 3, md: 4 }}
-          justify="center"
-          align="center"
-          color="black"
-          fontSize={{ base: "sm", md: "sm" }}
-          fontWeight="normal"
-          py={{ base: 2, md: 2 }}
-          width="100%"
-          px={{ base: 4, md: 0 }}
-        >
-          {[
-            "Siddhartha (N200081)",
-            "Satya Vamsi (N200346)",
-            "Bhanu Vara Prasad (N200532)",
-            "KMS Sudheer (N200715)",
-            "Dheeraj (N200800)"
-          ].map((name, index, array) => (
-            <Text 
-              key={name}
-              textAlign="center"
-              px={{ base: 3, md: 2 }}
-              py={{ base: 1, md: 0 }}
-              borderRadius="md"
-              _hover={{ bg: "gray.100" }}
-              transition="background 0.2s"
-              width={{ base: "full", md: "auto" }}
-            >
-              {name}
-            </Text>
-          ))}
-        </Stack>
-      </VStack>
+      <Container maxW="container.xl">
+        <VStack spacing={8}>
+          {/* Main Content */}
+          <Stack
+            direction={{ base: 'column', md: 'row' }}
+            spacing={{ base: 8, md: 16 }}
+            w="full"
+            justify="space-between"
+            align={{ base: 'center', md: 'flex-start' }}
+          >
+            {/* Left Section */}
+            <VStack align={{ base: 'center', md: 'flex-start' }} spacing={4}>
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                bgGradient="linear(to-r, blue.400, purple.400)"
+                bgClip="text"
+              >
+                NPTEL Management
+              </Text>
+              <Text
+                color="gray.400"
+                textAlign={{ base: 'center', md: 'left' }}
+                maxW="md"
+              >
+                Empowering education through efficient course management and student progress tracking.
+              </Text>
+            </VStack>
+
+            {/* Right Section */}
+            <VStack align={{ base: 'center', md: 'flex-start' }} spacing={4}>
+              <Text
+                fontSize="lg"
+                fontWeight="semibold"
+                color="gray.300"
+              >
+                Developed by RGUKT-Nuzvid CSE
+              </Text>
+              <VStack 
+                spacing={3} 
+                align={{ base: 'center', md: 'flex-start' }}
+                w="full"
+              >
+                {names.map((row, rowIndex) => (
+                  <Stack
+                    key={rowIndex}
+                    direction={{ base: 'column', sm: 'row' }}
+                    spacing={{ base: 2, sm: 4, md: 6 }}
+                    justify={{ base: 'center', md: 'flex-start' }}
+                    align="center"
+                    w="full"
+                  >
+                    {row.map((name) => (
+                      <Text
+                        key={name}
+                        color="gray.400"
+                        fontSize="sm"
+                        _hover={{
+                          color: 'blue.300',
+                          transform: 'translateY(-2px)'
+                        }}
+                        transition="all 0.3s"
+                        cursor="pointer"
+                        textAlign="center"
+                      >
+                        {name}
+                      </Text>
+                    ))}
+                  </Stack>
+                ))}
+              </VStack>
+            </VStack>
+          </Stack>
+
+          <Divider borderColor="gray.700" />
+
+          {/* Bottom Section */}
+          <Text 
+            color="gray.400" 
+            fontSize="sm"
+            textAlign="center"
+          >
+            © {new Date().getFullYear()} NPTEL Management. All rights reserved.
+          </Text>
+        </VStack>
+      </Container>
     </Box>
   );
 };
