@@ -281,9 +281,9 @@ const calculateWeeklyStats = (students, courseId, facultyName) => {
       submissionRate: stats.total > 0 ? (stats.submitted / stats.total) * 100 : 0
     }))
     .sort((a, b) => {
-      const weekA = parseInt(a.week.match(/\d+/)[0]);
-      const weekB = parseInt(b.match(/\d+/)[0]);
-      return weekA - weekB;
+      const weekNumA = parseInt(a.week.replace(/\D/g, '')) || 0;
+      const weekNumB = parseInt(b.week.replace(/\D/g, '')) || 0;
+      return weekNumA - weekNumB;
     });
 };
 

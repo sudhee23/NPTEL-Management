@@ -92,6 +92,7 @@ function Navbar() {
             fontWeight="medium"
             p={2}
             _hover={{ bg: 'gray.50' }}
+            onClick={onToggle}
           >
             Dashboard
           </Link>
@@ -102,8 +103,9 @@ function Navbar() {
             fontWeight="medium"
             p={2}
             _hover={{ bg: 'gray.50' }}
+            onClick={onToggle}
           >
-            Course Data
+            Faculty Stats
           </Link>
           <Link 
             as={RouterLink} 
@@ -112,6 +114,7 @@ function Navbar() {
             fontWeight="medium"
             p={2}
             _hover={{ bg: 'gray.50' }}
+            onClick={onToggle}
           >
             Students
           </Link>
@@ -123,6 +126,7 @@ function Navbar() {
               fontWeight="medium"
               p={2}
               _hover={{ bg: 'gray.50' }}
+              onClick={onToggle}
             >
               Upload Excel
             </Link>
@@ -134,12 +138,16 @@ function Navbar() {
             fontWeight="medium"
             p={2}
             _hover={{ bg: 'gray.50' }}
+            onClick={onToggle}
           >
             Upload Csv
           </Link>
           <Box p={2}>
             <Button 
-              onClick={handleLogout} 
+              onClick={() => {
+                handleLogout();
+                onToggle();
+              }} 
               colorScheme="red" 
               size="sm" 
               width="full"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import StudentList from './components/StudentList';
@@ -8,18 +8,24 @@ import UploadExcel from './components/UploadExcel';
 import UpdateWeeklyScore from './components/UpdateWeeklyScore';
 import Login from './components/Login';
 import Stats from './components/Stats';
-
+import Footer from './components/Footer';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  return isAuthenticated ? (
-    <>
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return (
+    <Flex direction="column" minH="100vh">
       <Navbar />
-      {children}
-    </>
-  ) : (
-    <Navigate to="/login" />
+      <Box flex="1">
+        {children}
+      </Box>
+      <Footer />
+    </Flex>
   );
 };
 

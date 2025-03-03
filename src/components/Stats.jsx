@@ -38,7 +38,6 @@ const Stats = () => {
   const [courseStats, setCourseStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showBranchTable, setShowBranchTable] = useState(false);
   const toast = useToast();
 
   // Add state for overall stats
@@ -57,6 +56,9 @@ const Stats = () => {
 
   // Update selected week to be null initially
   const [selectedWeek, setSelectedWeek] = useState('');
+
+  // Add showBranchTable state if not already present
+  const [showBranchTable, setShowBranchTable] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async (retryCount = 0) => {
@@ -434,23 +436,32 @@ const Stats = () => {
             cursor="pointer"
             onClick={() => setShowBranchTable(!showBranchTable)}
             py={4}
-            // px={2}
+            px={4}
             bg="gray.50"
             borderRadius="lg"
             _hover={{ bg: "gray.100" }}
+            transition="all 0.2s"
           >
             <Heading size="lg">Branch-wise Statistics</Heading>
-            <Text color="blue.500">
-              {showBranchTable ? 'Hide Table' : 'Show Table'}
+            <Text color="blue.500" fontWeight="medium">
+              {showBranchTable ? 'Hide Details ▼' : 'Show Details ▶'}
             </Text>
           </Box>
           
-          {showBranchTable && (
+          <Box
+            overflow="hidden"
+            transition="all 0.3s ease"
+            maxHeight={showBranchTable ? "1000px" : "0"}
+            opacity={showBranchTable ? 1 : 0}
+            mb={showBranchTable ? 6 : 0}
+          >
             <Box 
               overflowX="auto"
               borderRadius="lg"
               boxShadow="sm"
               bg="white"
+              border="1px"
+              borderColor="gray.200"
             >
               <Table variant="simple">
                 <Thead>
@@ -465,7 +476,7 @@ const Stats = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">CE</Td>
                     <Td isNumeric>63</Td>
                     <Td isNumeric>112</Td>
@@ -474,7 +485,7 @@ const Stats = () => {
                     <Td isNumeric>1</Td>
                     <Td isNumeric>2</Td>
                   </Tr>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">CHE</Td>
                     <Td isNumeric>42</Td>
                     <Td isNumeric>86</Td>
@@ -483,7 +494,7 @@ const Stats = () => {
                     <Td isNumeric>2</Td>
                     <Td isNumeric>5</Td>
                   </Tr>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">CSE</Td>
                     <Td isNumeric>363</Td>
                     <Td isNumeric>356</Td>
@@ -492,7 +503,7 @@ const Stats = () => {
                     <Td isNumeric>1</Td>
                     <Td isNumeric>3</Td>
                   </Tr>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">ECE</Td>
                     <Td isNumeric>361</Td>
                     <Td isNumeric>350</Td>
@@ -501,7 +512,7 @@ const Stats = () => {
                     <Td isNumeric>2</Td>
                     <Td isNumeric>11</Td>
                   </Tr>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">EEE</Td>
                     <Td isNumeric>118</Td>
                     <Td isNumeric>69</Td>
@@ -510,7 +521,7 @@ const Stats = () => {
                     <Td isNumeric>1</Td>
                     <Td isNumeric>3</Td>
                   </Tr>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">ME</Td>
                     <Td isNumeric>60</Td>
                     <Td isNumeric>50</Td>
@@ -519,7 +530,7 @@ const Stats = () => {
                     <Td isNumeric>1</Td>
                     <Td isNumeric>4</Td>
                   </Tr>
-                  <Tr>
+                  <Tr _hover={{ bg: "gray.50" }}>
                     <Td fontWeight="semibold">MME</Td>
                     <Td isNumeric>25</Td>
                     <Td isNumeric>18</Td>
@@ -528,19 +539,19 @@ const Stats = () => {
                     <Td isNumeric>1</Td>
                     <Td isNumeric>2</Td>
                   </Tr>
-                  <Tr bg="gray.50">
-                    <Td fontWeight="bold">Total</Td>
-                    <Td isNumeric fontWeight="bold">1,032</Td>
-                    <Td isNumeric fontWeight="bold">1,041</Td>
-                    <Td isNumeric fontWeight="bold">2,073</Td>
-                    <Td isNumeric fontWeight="bold">21</Td>
-                    <Td isNumeric fontWeight="bold">9</Td>
-                    <Td isNumeric fontWeight="bold">30</Td>
+                  <Tr bg="gray.50" fontWeight="bold">
+                    <Td>Total</Td>
+                    <Td isNumeric>1,032</Td>
+                    <Td isNumeric>1,041</Td>
+                    <Td isNumeric>2,073</Td>
+                    <Td isNumeric>21</Td>
+                    <Td isNumeric>9</Td>
+                    <Td isNumeric>30</Td>
                   </Tr>
                 </Tbody>
               </Table>
             </Box>
-          )}
+          </Box>
         </Box>
 
         <Heading size="lg" mb={4}>Course Statistics</Heading>
@@ -619,6 +630,22 @@ const Stats = () => {
         <Box>
           <Heading size="md" mb={4}>Weekly Assignment Statistics</Heading>
           
+          {/* Week Selection Dropdown - Move this to the top */}
+          <FormControl mb={6}>
+            {/* <FormLabel>Select Week to View Details</FormLabel>
+            <Select
+              value={selectedWeek}
+              onChange={(e) => setSelectedWeek(e.target.value)}
+            >
+              <option value="">Select a week</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  Week {i + 1}
+                </option>
+              ))}
+            </Select> */}
+          </FormControl>
+
           {/* Updated Weekly Stats Cards */}
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 4, md: 6 }}>
             {overallWeeklyStats.map((week, index) => (
@@ -736,8 +763,8 @@ const Stats = () => {
             <Text color="gray.600" mb={4}>
               Course ID: {selectedCourse.toUpperCase()}
             </Text>
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-              {/* Overall Stats */}
+            {/* <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+              Overall Stats
               <Card>
                 <CardBody>
                   <Stat>
@@ -762,7 +789,7 @@ const Stats = () => {
                   </Stat>
                 </CardBody>
               </Card>
-            </SimpleGrid>
+            </SimpleGrid> */}
           </Box>
         )}
 
