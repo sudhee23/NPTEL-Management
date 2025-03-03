@@ -56,11 +56,9 @@ function Navbar() {
             Dashboard
           </Link>
           <Link as={RouterLink} to="/course-data" color="gray.600" fontWeight="medium">
-            Course Data
+            Faculty Stats
           </Link>
-          <Link as={RouterLink} to="/students" color="gray.600" fontWeight="medium">
-            Students
-          </Link>
+          
           {isAdmin && (
             <Link as={RouterLink} to="/upload" color="gray.600" fontWeight="medium">
               Upload Excel

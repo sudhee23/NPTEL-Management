@@ -38,6 +38,7 @@ const Stats = () => {
   const [courseStats, setCourseStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showBranchTable, setShowBranchTable] = useState(false);
   const toast = useToast();
 
   // Add state for overall stats
@@ -425,101 +426,121 @@ const Stats = () => {
         </Box>
 
         <Box mt={8}>
-          <Heading size="lg" mb={6}>Branch-wise Statistics</Heading>
           <Box 
-            overflowX="auto"
+            display="flex" 
+            justifyContent="space-between" 
+            alignItems="center" 
+            mb={6}
+            cursor="pointer"
+            onClick={() => setShowBranchTable(!showBranchTable)}
+            py={4}
+            // px={2}
+            bg="gray.50"
             borderRadius="lg"
-            boxShadow="sm"
-            bg="white"
+            _hover={{ bg: "gray.100" }}
           >
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th bg="gray.50" borderTopLeftRadius="lg">Branch</Th>
-                  <Th isNumeric color="blue.700">E3 Students</Th>
-                  <Th isNumeric color="blue.700">E4 Students</Th>
-                  <Th isNumeric color="green.700">Total Students</Th>
-                  <Th isNumeric color="purple.700">E3 Subjects</Th>
-                  <Th isNumeric color="purple.700">E4 Subjects</Th>
-                  <Th isNumeric color="purple.700">Total Subjects</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td fontWeight="semibold">CE</Td>
-                  <Td isNumeric>63</Td>
-                  <Td isNumeric>112</Td>
-                  <Td isNumeric fontWeight="medium">175</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>2</Td>
-                </Tr>
-                <Tr>
-                  <Td fontWeight="semibold">CHE</Td>
-                  <Td isNumeric>42</Td>
-                  <Td isNumeric>86</Td>
-                  <Td isNumeric fontWeight="medium">128</Td>
-                  <Td isNumeric>3</Td>
-                  <Td isNumeric>2</Td>
-                  <Td isNumeric>5</Td>
-                </Tr>
-                <Tr>
-                  <Td fontWeight="semibold">CSE</Td>
-                  <Td isNumeric>363</Td>
-                  <Td isNumeric>356</Td>
-                  <Td isNumeric fontWeight="medium">719</Td>
-                  <Td isNumeric>2</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>3</Td>
-                </Tr>
-                <Tr>
-                  <Td fontWeight="semibold">ECE</Td>
-                  <Td isNumeric>361</Td>
-                  <Td isNumeric>350</Td>
-                  <Td isNumeric fontWeight="medium">711</Td>
-                  <Td isNumeric>9</Td>
-                  <Td isNumeric>2</Td>
-                  <Td isNumeric>11</Td>
-                </Tr>
-                <Tr>
-                  <Td fontWeight="semibold">EEE</Td>
-                  <Td isNumeric>118</Td>
-                  <Td isNumeric>69</Td>
-                  <Td isNumeric fontWeight="medium">187</Td>
-                  <Td isNumeric>2</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>3</Td>
-                </Tr>
-                <Tr>
-                  <Td fontWeight="semibold">ME</Td>
-                  <Td isNumeric>60</Td>
-                  <Td isNumeric>50</Td>
-                  <Td isNumeric fontWeight="medium">110</Td>
-                  <Td isNumeric>3</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>4</Td>
-                </Tr>
-                <Tr>
-                  <Td fontWeight="semibold">MME</Td>
-                  <Td isNumeric>25</Td>
-                  <Td isNumeric>18</Td>
-                  <Td isNumeric fontWeight="medium">43</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>1</Td>
-                  <Td isNumeric>2</Td>
-                </Tr>
-                <Tr bg="gray.50">
-                  <Td fontWeight="bold">Total</Td>
-                  <Td isNumeric fontWeight="bold">1,032</Td>
-                  <Td isNumeric fontWeight="bold">1,041</Td>
-                  <Td isNumeric fontWeight="bold">2,073</Td>
-                  <Td isNumeric fontWeight="bold">21</Td>
-                  <Td isNumeric fontWeight="bold">9</Td>
-                  <Td isNumeric fontWeight="bold">30</Td>
-                </Tr>
-              </Tbody>
-            </Table>
+            <Heading size="lg">Branch-wise Statistics</Heading>
+            <Text color="blue.500">
+              {showBranchTable ? 'Hide Table' : 'Show Table'}
+            </Text>
           </Box>
+          
+          {showBranchTable && (
+            <Box 
+              overflowX="auto"
+              borderRadius="lg"
+              boxShadow="sm"
+              bg="white"
+            >
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th bg="gray.50" borderTopLeftRadius="lg">Branch</Th>
+                    <Th isNumeric color="blue.700">E3 Students</Th>
+                    <Th isNumeric color="blue.700">E4 Students</Th>
+                    <Th isNumeric color="green.700">Total Students</Th>
+                    <Th isNumeric color="purple.700">E3 Subjects</Th>
+                    <Th isNumeric color="purple.700">E4 Subjects</Th>
+                    <Th isNumeric color="purple.700">Total Subjects</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td fontWeight="semibold">CE</Td>
+                    <Td isNumeric>63</Td>
+                    <Td isNumeric>112</Td>
+                    <Td isNumeric fontWeight="medium">175</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>2</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="semibold">CHE</Td>
+                    <Td isNumeric>42</Td>
+                    <Td isNumeric>86</Td>
+                    <Td isNumeric fontWeight="medium">128</Td>
+                    <Td isNumeric>3</Td>
+                    <Td isNumeric>2</Td>
+                    <Td isNumeric>5</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="semibold">CSE</Td>
+                    <Td isNumeric>363</Td>
+                    <Td isNumeric>356</Td>
+                    <Td isNumeric fontWeight="medium">719</Td>
+                    <Td isNumeric>2</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>3</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="semibold">ECE</Td>
+                    <Td isNumeric>361</Td>
+                    <Td isNumeric>350</Td>
+                    <Td isNumeric fontWeight="medium">711</Td>
+                    <Td isNumeric>9</Td>
+                    <Td isNumeric>2</Td>
+                    <Td isNumeric>11</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="semibold">EEE</Td>
+                    <Td isNumeric>118</Td>
+                    <Td isNumeric>69</Td>
+                    <Td isNumeric fontWeight="medium">187</Td>
+                    <Td isNumeric>2</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>3</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="semibold">ME</Td>
+                    <Td isNumeric>60</Td>
+                    <Td isNumeric>50</Td>
+                    <Td isNumeric fontWeight="medium">110</Td>
+                    <Td isNumeric>3</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>4</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="semibold">MME</Td>
+                    <Td isNumeric>25</Td>
+                    <Td isNumeric>18</Td>
+                    <Td isNumeric fontWeight="medium">43</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>1</Td>
+                    <Td isNumeric>2</Td>
+                  </Tr>
+                  <Tr bg="gray.50">
+                    <Td fontWeight="bold">Total</Td>
+                    <Td isNumeric fontWeight="bold">1,032</Td>
+                    <Td isNumeric fontWeight="bold">1,041</Td>
+                    <Td isNumeric fontWeight="bold">2,073</Td>
+                    <Td isNumeric fontWeight="bold">21</Td>
+                    <Td isNumeric fontWeight="bold">9</Td>
+                    <Td isNumeric fontWeight="bold">30</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Box>
+          )}
         </Box>
 
         <Heading size="lg" mb={4}>Course Statistics</Heading>
@@ -550,7 +571,7 @@ const Stats = () => {
         )}
 
         {/* Overall Stats Section - Always visible */}
-        <Box>
+        {/* <Box>
           <Heading size="md" mb={4}>Overall Statistics</Heading>
           <SimpleGrid columns={{ base: 1, md: 4 }} spacing={{ base: 4, md: 6 }}>
             <Card width="100%">
@@ -592,28 +613,12 @@ const Stats = () => {
               </CardBody>
             </Card>
           </SimpleGrid>
-        </Box>
+        </Box> */}
 
         {/* Overall Weekly Statistics - Always visible */}
         <Box>
           <Heading size="md" mb={4}>Weekly Assignment Statistics</Heading>
           
-          {/* Week Selection Dropdown - Move this to the top */}
-          <FormControl mb={6}>
-            <FormLabel>Select Week to View Details</FormLabel>
-            <Select
-              value={selectedWeek}
-              onChange={(e) => setSelectedWeek(e.target.value)}
-            >
-              <option value="">Select a week</option>
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  Week {i + 1}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-
           {/* Updated Weekly Stats Cards */}
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 4, md: 6 }}>
             {overallWeeklyStats.map((week, index) => (

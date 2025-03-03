@@ -36,6 +36,7 @@ import {
   VStack,
   Skeleton,
   useToast,
+  Progress,
 } from '@chakra-ui/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import { RepeatIcon, InfoIcon, DownloadIcon } from '@chakra-ui/icons';
@@ -56,13 +57,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [unsubmittedStudents, setUnsubmittedStudents] = useState([]);
-  const [selectedFacultyStudents, setSelectedFacultyStudents] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    isOpen: isFacultyModalOpen,
-    onOpen: onFacultyModalOpen,
-    onClose: onFacultyModalClose
-  } = useDisclosure();
   const toast = useToast();
 
   const [filters, setFilters] = useState({
@@ -74,7 +69,34 @@ function Dashboard() {
   });
 
   const [filterOptions, setFilterOptions] = useState({
-    facultyNames: [],
+    facultyNames: [
+      'Dr. SELVETIKAR ASHOK',
+      'Yathati Sankeerth',
+      'JANGILI PRASAD',
+      'Perumallapalli Krishna',
+      'Adavipalli Chandana',
+      'Jagu Srinivasa Rao',
+      'T Siva Kumar Prudhviraj',
+      'MadhuSudhana Reddy Mule',
+      'K Lakshmi Kanth',
+      'SIVALAL',
+      'PERAKA SHYAM',
+      'SURESH KALLEPALLI',
+      'Priyanka',
+      'Satyadev Manepalli',
+      'AMIT KUMAR PANIGRAHY',
+      'Dr Jyothilal Nayak Bharothu',
+      'Subbi Naidu Bora',
+      'TADI SUNIL BHAGAT',
+      'Deepti Sahoo',
+      'D Srilakshmi',
+      'SEKHAR VEMPATI',
+      'Dr. Charles Stud Angalakurthi',
+      'VENKATESWARA RAO KANKATA',
+      'Dr. Pavani Udatha',
+      'Shravani Kanaka Kumari P',
+      'RACHARLA SIVA NARAYANA'
+    ],
     years: [],
     branches: [],
     courseIds: [],
@@ -99,10 +121,8 @@ function Dashboard() {
         );
         
         setStudents(fetchedStudents);
-        
-        // Extract filter options
-        const options = {
-          facultyNames: [...new Set(fetchedStudents.flatMap(s => s.courses?.map(c => c.subjectMentor) || []))],
+        setFilterOptions({
+          ...filterOptions,
           years: [...new Set(fetchedStudents.map(s => s.year))],
           branches: [...new Set(fetchedStudents.map(s => s.branch))],
           courseIds: [...new Set(fetchedStudents.flatMap(s => s.courses?.map(c => c.courseId) || []))],
@@ -113,25 +133,18 @@ function Dashboard() {
             const weekB = parseInt(b.match(/\d+/)[0]);
             return weekA - weekB;
           })
-        };
-        setFilterOptions(options);
+        });
         
         updateStats(fetchedStudents);
       } catch (error) {
         console.error('Error fetching students:', error);
-        toast({
-          title: "Error fetching data",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchStudents();
-  }, []); // Only run on mount
+  }, []);
 
   // Separate effect for filter updates
   useEffect(() => {
@@ -303,6 +316,10 @@ const resetFilters = () => {
     status: 'info',
     duration: 2000,
     isClosable: true,
+    position: "top",
+    containerStyle: {
+      marginTop: "120px"
+    }
   });
 };
 
@@ -316,6 +333,10 @@ const handleViewUnsubmitted = async (weekData) => {
       status: "warning",
       duration: 3000,
       isClosable: true,
+      position: "top",
+      containerStyle: {
+        marginTop: "120px"
+      }
     });
     return;
   }
@@ -356,34 +377,14 @@ const handleViewUnsubmitted = async (weekData) => {
       status: "error",
       duration: 3000,
       isClosable: true,
+      position: "top",
+      containerStyle: {
+        marginTop: "120px"
+      }
     });
   } finally {
     setLoading(false);
   }
-};
-
-const handleFacultyClick = (facultyName) => {
-  if (!filters.courseId) {
-    toast({
-      title: "Please select a course",
-      status: "warning",
-      duration: 3000,
-      isClosable: true,
-    });
-    return;
-  }
-
-  const facultyStudents = students.filter(student => {
-    const yearMatch = !filters.year || student.year === filters.year;
-    const branchMatch = !filters.branch || student.branch === filters.branch;
-    return yearMatch && branchMatch && student.courses.some(course => 
-      course.subjectMentor === facultyName && 
-      course.courseId === filters.courseId
-    );
-  });
-
-  setSelectedFacultyStudents(facultyStudents);
-  onFacultyModalOpen();
 };
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -418,8 +419,7 @@ return (
         transition={{ duration: 0.5 }}
       >
         <Box>
-          <Heading size="lg" mb={6}>Course Data</Heading>
-          <Text color="gray.600">Monitor student performance and submission statistics</Text>
+          <Heading size="lg" mb={6}>Faculty Submission Statistics</Heading>
         </Box>
       </MotionBox>
 
@@ -438,58 +438,12 @@ return (
                 value={filters.facultyName}
                 onChange={(e) => {
                   setFilters({...filters, facultyName: e.target.value});
-                  if (e.target.value) {
-                    handleFacultyClick(e.target.value);
-                  }
                 }}
-                maxW="200px"
+                maxW="300px"
+                size="md"
               >
                 {filterOptions.facultyNames.map(name => (
                   <option key={name} value={name}>{name}</option>
-                ))}
-              </Select>
-
-              <Select
-                placeholder="Select Year"
-                value={filters.year}
-                onChange={(e) => setFilters({...filters, year: e.target.value})}
-                maxW="200px"
-              >
-                {filterOptions.years.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </Select>
-
-              <Select
-                placeholder="Select Branch"
-                value={filters.branch}
-                onChange={(e) => setFilters({...filters, branch: e.target.value})}
-                maxW="200px"
-              >
-                {filterOptions.branches.map(branch => (
-                  <option key={branch} value={branch}>{branch}</option>
-                ))}
-              </Select>
-
-              <Select
-                placeholder="Select Course"
-                value={filters.courseId}
-                onChange={(e) => setFilters({...filters, courseId: e.target.value})}
-                maxW="200px"
-              >
-                {filterOptions.courseIds.map(id => (
-                  <option key={id} value={id}>{id.toUpperCase()}</option>
-                ))}
-              </Select>
-
-              <Select
-                placeholder="Select Week"
-                value={filters.week}
-                onChange={(e) => setFilters({...filters, week: e.target.value})}
-                maxW="200px"
-              >
-                {filterOptions.weeks.map(week => (
-                  <option key={week} value={week}>{week}</option>
                 ))}
               </Select>
 
@@ -517,168 +471,93 @@ return (
         </CardBody>
       </MotionCard>
 
-      <SimpleGrid 
-        columns={{ 
-          base: 1, 
-          md: stats.branchStats ? Object.keys(stats.branchStats).length + 1 : 4 
-        }} 
-        spacing={5} 
-        mb={5}
-      >
-        <MotionCard
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <CardBody>
-            <Stat>
-              <StatLabel>Total Students</StatLabel>
-              <StatNumber>{stats.totalStudents}</StatNumber>
-              <StatHelpText>
-                {filters.year && `Year: ${filters.year}`}
-                {filters.branch && ` • Branch: ${filters.branch}`}
-              </StatHelpText>
-            </Stat>
-          </CardBody>
-        </MotionCard>
+      {/* Weekly Stats Cards */}
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
+        {loading ? (
+          // Loading skeletons
+          Array.from({ length: 12 }).map((_, index) => (
+            <MotionCard
+              key={`skeleton-${index}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <CardBody>
+                <Stack spacing={4}>
+                  <Box>
+                    <Skeleton height="24px" width="120px" mb={2} />
+                    <Stack spacing={2}>
+                      <Skeleton height="20px" width="140px" />
+                      <Skeleton height="20px" width="160px" />
+                      <Skeleton height="16px" width="100px" />
+                    </Stack>
+                  </Box>
 
-        {stats.branchStats && Object.entries(stats.branchStats).map(([branch, data], index) => (
-          <MotionCard
-            key={branch}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 + (index * 0.1) }}
-          >
-            <CardBody>
-              <Stat>
-                <StatLabel>{branch} Course Students</StatLabel>
-                <StatNumber>{data.totalStudents}</StatNumber>
-                <StatHelpText>All NOC25-{branch} Courses</StatHelpText>
-              </Stat>
-            </CardBody>
-          </MotionCard>
-        ))}
+                  <Box>
+                    <Skeleton height="20px" width="180px" mb={2} />
+                    <Skeleton height="8px" borderRadius="full" />
+                  </Box>
+
+                  <Skeleton height="32px" width="120px" />
+                </Stack>
+              </CardBody>
+            </MotionCard>
+          ))
+        ) : (
+          // Actual weekly stats cards
+          stats.weeklyStats
+            .filter(week => !week.week.includes('Week 0'))
+            .map((week, index) => (
+              <MotionCard
+                key={week.week}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <CardBody>
+                  <Stack spacing={4}>
+                    <Box>
+                      <Heading size="md" mb={2}>{week.week}</Heading>
+                      <Stack spacing={2}>
+                        <Text color="green.500" fontWeight="medium">
+                          Submitted: {week.submitted}
+                        </Text>
+                        <Text color="red.500" fontWeight="medium">
+                          Not Submitted: {week.notSubmitted}
+                        </Text>
+                        <Text fontSize="sm" color="gray.600">
+                          Total: {week.submitted + week.notSubmitted}
+                        </Text>
+                      </Stack>
+                    </Box>
+
+                    <Box>
+                      <Text mb={2}>
+                        Submission Rate: {Math.round(week.submissionRate)}%
+                      </Text>
+                      <Progress 
+                        value={week.submissionRate} 
+                        colorScheme={week.submissionRate > 50 ? "green" : "orange"}
+                        borderRadius="full"
+                      />
+                    </Box>
+
+                    {filters.courseId && (
+                      <Button
+                        size="sm"
+                        colorScheme="blue"
+                        onClick={() => handleViewUnsubmitted(week.week)}
+                        isDisabled={week.submitted + week.notSubmitted === 0}
+                      >
+                        View Unsubmitted
+                      </Button>
+                    )}
+                  </Stack>
+                </CardBody>
+              </MotionCard>
+            ))
+        )}
       </SimpleGrid>
-
-      {/* Add this if you want to show current week's submission stats */}
-      {stats.weeklyStats.length > 0 && filters.courseId && (
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5} mb={5}>
-          <MotionCard
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <CardBody>
-              <Stat>
-                <StatLabel>Latest Week Submissions</StatLabel>
-                <StatNumber>
-                  {stats.weeklyStats[stats.weeklyStats.length - 1]?.submitted || 0}
-                </StatNumber>
-                <StatHelpText>
-                  {stats.weeklyStats[stats.weeklyStats.length - 1]?.week}
-                </StatHelpText>
-              </Stat>
-            </CardBody>
-          </MotionCard>
-
-          <MotionCard
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <CardBody>
-              <Stat>
-                <StatLabel>Not Submitted</StatLabel>
-                <StatNumber>
-                  {stats.weeklyStats[stats.weeklyStats.length - 1]?.notSubmitted || 0}
-                </StatNumber>
-                <StatHelpText>
-                  {stats.weeklyStats[stats.weeklyStats.length - 1]?.week}
-                </StatHelpText>
-              </Stat>
-            </CardBody>
-          </MotionCard>
-
-          <MotionCard
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <CardBody>
-              <Stat>
-                <StatLabel>Submission Rate</StatLabel>
-                <StatNumber>
-                  {Math.round(stats.weeklyStats[stats.weeklyStats.length - 1]?.submissionRate || 0)}%
-                </StatNumber>
-                <StatHelpText>
-                  {stats.weeklyStats[stats.weeklyStats.length - 1]?.week}
-                </StatHelpText>
-              </Stat>
-            </CardBody>
-          </MotionCard>
-        </SimpleGrid>
-      )}
-
-      {/* Weekly Submission Stats */}
-      <MotionCard>
-        <CardBody>
-          <HStack justify="space-between" mb={6}>
-            <Heading size="md">Weekly Submission Statistics</Heading>
-            <Tooltip label={filters.courseId ? 
-              "Hover over bars and click 'View Unsubmitted' to see details" : 
-              "Please select a course to view unsubmitted students"
-            }>
-              <InfoIcon color="gray.400" />
-            </Tooltip>
-          </HStack>
-          <Skeleton isLoaded={!loading} h="400px">
-            <Box h="400px">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={stats.weeklyStats}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 20,
-                    bottom: 80
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis 
-                    dataKey="week" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={80}
-                    tick={{ fill: '#4A5568', fontSize: 12 }}
-                  />
-                  <YAxis tick={{ fill: '#4A5568' }} />
-                  <RechartsTooltip 
-                    content={<CustomTooltip />}
-                    cursor={{ fill: 'transparent' }}
-                    wrapperStyle={{ outline: 'none' }}
-                  />
-                  <Legend 
-                    wrapperStyle={{ paddingTop: '20px' }}
-                    formatter={(value) => <span style={{ color: '#4A5568' }}>{value}</span>}
-                  />
-                  <Bar 
-                    dataKey="submitted" 
-                    name="Submitted" 
-                    fill="#48BB78"
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar 
-                    dataKey="notSubmitted" 
-                    name="Not Submitted" 
-                    fill="#F56565"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          </Skeleton>
-        </CardBody>
-      </MotionCard>
 
       {/* Unsubmitted Students Modal */}
       <Modal 
@@ -770,61 +649,6 @@ return (
                 <Text color="gray.500">No unsubmitted students found</Text>
               </Box>
             )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      {/* Faculty Students Modal */}
-      <Modal 
-        isOpen={isFacultyModalOpen} 
-        onClose={onFacultyModalClose}
-        size="xl"
-        scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalContent maxW="900px">
-          <ModalHeader>
-            <Text>Students for {filters.facultyName} - {filters.courseId}</Text>
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Roll Number</Th>
-                  <Th>Name</Th>
-                  <Th>Branch</Th>
-                  <Th>Results</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {selectedFacultyStudents.map((student) => {
-                  const course = student.courses.find(c => 
-                    c.courseId === filters.courseId
-                  );
-                  return (
-                    <Tr key={student._id}>
-                      <Td>{student.rollNumber}</Td>
-                      <Td>{student.name}</Td>
-                      <Td>{student.branch}</Td>
-                      <Td>
-                        {course?.results?.length > 0 ? (
-                          <VStack align="start">
-                            {course.results.map((result, idx) => (
-                              <Text key={idx}>
-                                Week {result.week}: {result.score}
-                              </Text>
-                            ))}
-                          </VStack>
-                        ) : (
-                          <Text color="gray.500">No results available</Text>
-                        )}
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
           </ModalBody>
         </ModalContent>
       </Modal>
