@@ -88,6 +88,17 @@ function Navbar() {
               Faculty Stats
             </Link>
             
+            <Link 
+              as={RouterLink} 
+              to="/students" 
+              color="gray.700" 
+              fontWeight="medium"
+              _hover={{ color: 'blue.500', textDecoration: 'none' }}
+              transition="color 0.2s"
+            >
+              Students
+            </Link>
+            
             {isAdmin && (
               <Link 
                 as={RouterLink} 
@@ -166,6 +177,22 @@ function Navbar() {
               onClick={onToggle}
             >
               Faculty Stats
+            </Link>
+            <Link 
+              as={RouterLink} 
+              to="/students" 
+              color="gray.700" 
+              fontWeight="medium"
+              p={2}
+              w="full"
+              display="flex"
+              justifyContent="center"
+              borderRadius="md"
+              _hover={{ bg: 'blue.50', color: 'blue.500', textDecoration: 'none' }}
+              transition="all 0.2s"
+              onClick={onToggle}
+            >
+              Students
             </Link>
             {isAdmin && (
               <Link 

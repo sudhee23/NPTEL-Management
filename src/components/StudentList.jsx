@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Table,
@@ -40,8 +40,16 @@ import { SearchIcon, InfoIcon, ChevronDownIcon, RepeatIcon } from '@chakra-ui/ic
 import axios from 'axios';
 
 function StudentList() {
+  // All hooks must be called at the top level, in the same order every render
+  const tableBg = useColorModeValue('white', 'gray.700');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const hoverBg = useColorModeValue('gray.50', 'gray.600');
+  const headerBg = useColorModeValue('gray.50', 'gray.700');
+
+  // State hooks
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     branch: '',
@@ -49,40 +57,39 @@ function StudentList() {
     courseId: ''
   });
 
-  // Color modes for better UI
-  const tableBg = useColorModeValue('white', 'gray.700');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const hoverBg = useColorModeValue('gray.50', 'gray.600');
+  // Memoized functions
+  const fetchStudents = useCallback(async () => {
+    try {
+      const response = await axios.get('https://nptel-management-backend.onrender.com/api/students');
+      setStudents(response.data);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      setError('Failed to fetch students. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // Extract unique values for filters
+  // Effect hooks
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  // Derived values
   const branches = [...new Set(students.map(student => student.branch))].sort();
   const years = [...new Set(students.map(student => student.year))].sort();
   const courseIds = [...new Set(students.flatMap(student => 
     student.courses.map(course => course.courseId)
   ))].sort();
 
-  // Score color function
+  // Helper functions
   const getScoreColor = (score) => {
     if (score >= 80) return 'green.500';
     if (score >= 60) return 'yellow.500';
     if (score >= 40) return 'orange.500';
     return 'red.500';
   };
-
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get('https://nptel-management-backend.onrender.com/api/students');
-        setStudents(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching students:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchStudents();
-  }, []);
 
   const resetFilters = () => {
     setFilters({
@@ -115,8 +122,38 @@ function StudentList() {
     );
   }
 
+  if (error) {
+    return (
+      <Box p={8} textAlign="center">
+        <Heading size="md" color="red.500" mb={4}>
+          Error Loading Students
+        </Heading>
+        <Text color="gray.600" mb={4}>{error}</Text>
+        <Button 
+          colorScheme="blue" 
+          onClick={() => {
+            setLoading(true);
+            setError(null);
+            fetchStudents();
+          }}
+        >
+          Retry
+        </Button>
+      </Box>
+    );
+  }
+
+  if (students.length === 0) {
+    return (
+      <Box p={8} textAlign="center">
+        <Heading size="md" mb={4}>No Students Found</Heading>
+        <Text color="gray.600">There are no students in the database yet.</Text>
+      </Box>
+    );
+  }
+
   return (
-    <Container maxW="container.xl">
+    <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
       <Box mb={8}>
         <Heading size="lg" mb={2}>Students Directory</Heading>
         <Text color="gray.600">Manage and view student information</Text>
@@ -127,7 +164,7 @@ function StudentList() {
         <Card variant="outline">
           <CardBody>
             <Stack spacing={4}>
-              <InputGroup size="lg">
+              <InputGroup size={{ base: "md", md: "lg" }}>
                 <InputLeftElement pointerEvents="none">
                   <SearchIcon color="gray.400" />
                 </InputLeftElement>
@@ -143,12 +180,12 @@ function StudentList() {
                 />
               </InputGroup>
 
-              <Flex gap={4} flexWrap="wrap">
+              <Flex gap={4} flexWrap="wrap" direction={{ base: "column", md: "row" }}>
                 <Select
                   placeholder="Select Branch"
                   value={filters.branch}
                   onChange={(e) => setFilters({...filters, branch: e.target.value})}
-                  maxW="200px"
+                  maxW={{ base: "100%", md: "200px" }}
                 >
                   {branches.map(branch => (
                     <option key={branch} value={branch}>{branch}</option>
@@ -159,7 +196,7 @@ function StudentList() {
                   placeholder="Select Year"
                   value={filters.year}
                   onChange={(e) => setFilters({...filters, year: e.target.value})}
-                  maxW="200px"
+                  maxW={{ base: "100%", md: "200px" }}
                 >
                   {years.map(year => (
                     <option key={year} value={year}>{year}</option>
@@ -170,7 +207,7 @@ function StudentList() {
                   placeholder="Select Course"
                   value={filters.courseId}
                   onChange={(e) => setFilters({...filters, courseId: e.target.value})}
-                  maxW="200px"
+                  maxW={{ base: "100%", md: "200px" }}
                 >
                   {courseIds.map(courseId => (
                     <option key={courseId} value={courseId}>{courseId.toUpperCase()}</option>
@@ -183,6 +220,7 @@ function StudentList() {
                     onClick={resetFilters}
                     aria-label="Reset filters"
                     variant="ghost"
+                    alignSelf={{ base: "flex-start", md: "center" }}
                   />
                 </Tooltip>
               </Flex>
@@ -206,15 +244,25 @@ function StudentList() {
             <Text fontSize="lg" color="gray.500">No students found matching your criteria</Text>
           </Box>
         ) : (
-          <Box overflowX="auto" borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-            <Table variant="simple" bg={tableBg}>
-              <Thead bg={useColorModeValue('gray.50', 'gray.700')}>
+          <Box 
+            overflowX="auto" 
+            borderRadius="lg" 
+            borderWidth="1px" 
+            borderColor={borderColor}
+            maxW="100%"
+          >
+            <Table 
+              variant="simple" 
+              bg={tableBg}
+              size={{ base: "sm", md: "md" }}
+            >
+              <Thead bg={headerBg}>
                 <Tr>
-                  <Th>Roll Number</Th>
+                  <Th display={{ base: "none", md: "table-cell" }}>Roll Number</Th>
                   <Th>Name</Th>
-                  <Th>Branch</Th>
-                  <Th>Year</Th>
-                  <Th>Email</Th>
+                  <Th display={{ base: "none", md: "table-cell" }}>Branch</Th>
+                  <Th display={{ base: "none", md: "table-cell" }}>Year</Th>
+                  <Th display={{ base: "none", md: "table-cell" }}>Email</Th>
                   <Th>Courses</Th>
                 </Tr>
               </Thead>
@@ -225,15 +273,19 @@ function StudentList() {
                     _hover={{ bg: hoverBg }}
                     transition="background 0.2s"
                   >
-                    <Td fontWeight="medium">{student.rollNumber}</Td>
-                    <Td>{student.name}</Td>
-                    <Td>
+                    <Td display={{ base: "none", md: "table-cell" }} fontWeight="medium">
+                      {student.rollNumber}
+                    </Td>
+                    <Td fontWeight="medium">{student.name}</Td>
+                    <Td display={{ base: "none", md: "table-cell" }}>
                       <Badge colorScheme="blue" borderRadius="full" px={2}>
                         {student.branch}
                       </Badge>
                     </Td>
-                    <Td>{student.year}</Td>
-                    <Td fontSize="sm">{student.email}</Td>
+                    <Td display={{ base: "none", md: "table-cell" }}>{student.year}</Td>
+                    <Td display={{ base: "none", md: "table-cell" }} fontSize="sm">
+                      {student.email}
+                    </Td>
                     <Td>
                       <Accordion allowToggle>
                         <AccordionItem border="none">
@@ -241,16 +293,28 @@ function StudentList() {
                             p={2} 
                             borderRadius="md"
                             _hover={{ bg: 'gray.100' }}
+                            width="100%"
+                            justifyContent="space-between"
                           >
-                            <Badge 
-                              colorScheme={student.courses.length > 0 ? 'green' : 'gray'}
-                              borderRadius="full"
-                              px={3}
-                              py={1}
-                            >
-                              {student.courses.length} Courses
-                            </Badge>
-                            <AccordionIcon ml={2} />
+                            <Box>
+                              <Badge 
+                                colorScheme={student.courses.length > 0 ? 'green' : 'gray'}
+                                borderRadius="full"
+                                px={3}
+                                py={1}
+                              >
+                                {student.courses.length} Courses
+                              </Badge>
+                              <Text 
+                                display={{ base: "inline", md: "none" }} 
+                                ml={2} 
+                                fontSize="sm" 
+                                color="gray.600"
+                              >
+                                {student.rollNumber} • {student.branch}
+                              </Text>
+                            </Box>
+                            <AccordionIcon />
                           </AccordionButton>
                           <AccordionPanel pb={4}>
                             <Stack spacing={4}>
